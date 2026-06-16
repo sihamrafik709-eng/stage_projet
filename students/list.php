@@ -6,69 +6,240 @@ $result = $conn->query("
     FROM students
     LEFT JOIN classes ON students.class_id = classes.id
 ");
-
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Students List</title>
 
 <link rel="stylesheet" href="../assets/css/style.css">
+
+<style>
+:root{
+    --bg-page:#eef1f6;
+    --surface:#ffffff;
+    --navy-900:#16213e;
+    --navy-700:#2c3e67;
+    --gold-500:#b8902a;
+    --slate-400:#94a3b8;
+    --green-600:#15803d;
+    --green-700:#0f5c2c;
+    --red-600:#c0392b;
+}
+
+body{
+    background:var(--bg-page);
+    margin:0;
+    font-family:Arial, sans-serif;
+}
+
+.container{
+    max-width:1200px;
+    margin:50px auto;
+    padding:0 20px;
+}
+
+.page-header{
+    margin-bottom:25px;
+}
+
+.page-eyebrow{
+    display:block;
+    font-size:12px;
+    font-weight:700;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+    color:var(--gold-500);
+    margin-bottom:8px;
+}
+
+.title{
+    font-size:30px;
+    font-weight:800;
+    color:var(--navy-900);
+    margin:0;
+}
+
+.title-rule{
+    width:60px;
+    height:3px;
+    background:var(--gold-500);
+    border:none;
+    margin:12px 0;
+}
+
+.page-meta{
+    color:var(--slate-400);
+}
+
+.card{
+    background:var(--surface);
+    border-radius:12px;
+    box-shadow:0 6px 24px rgba(22,33,62,.08);
+    overflow:hidden;
+}
+
+.table-wrapper{
+    overflow-x:auto;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+}
+
+thead{
+    background:var(--navy-900);
+    color:white;
+}
+
+th{
+    padding:15px;
+    text-align:left;
+}
+
+td{
+    padding:15px;
+    border-bottom:1px solid #e5e7eb;
+}
+
+
+.actions{
+    display:flex;
+    gap:8px;
+}
+
+.btn-edit{
+    background:var(--green-600);
+    color:white;
+    text-decoration:none;
+    padding:8px 12px;
+    border-radius:6px;
+    font-size:14px;
+}
+
+.btn-edit:hover{
+    background:var(--green-700);
+}
+
+.btn-delete{
+    background:var(--red-600);
+    color:white;
+    text-decoration:none;
+    padding:8px 12px;
+    border-radius:6px;
+    font-size:14px;
+}
+
+.btn-delete:hover{
+    opacity:.9;
+}
+
+.top-actions{
+    margin-bottom:20px;
+}
+
+.btn-add{
+    background:var(--green-600);
+    color:white;
+    text-decoration:none;
+    padding:12px 18px;
+    border-radius:8px;
+    font-weight:600;
+}
+
+.btn-add:hover{
+    background:var(--green-700);
+}
+</style>
 
 </head>
 <body>
 
 <div class="container">
 
-    <div class="title">Students List</div>
+    <div class="page-header">
+        <span class="page-eyebrow">School Records</span>
+        <h1 class="title">Students List</h1>
+        <hr class="title-rule">
+        <div class="page-meta">
+            Manage all student records.
+        </div>
+    </div>
 
-    <div class="table-wrapper">
+    <div class="top-actions">
+        <a href="add.php" class="btn-add">+ Add Student</a>
+    </div>
 
-        <table>
+    <div class="card">
 
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Name</th>   
-                    <th>Email</th>
-                    <th>Phone</th>
-                    <th>Class</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
+        <div class="table-wrapper">
 
-            <tbody>
+            <table>
+
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Full Name</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>Class</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+
+                <tbody>
 
                 <?php while($row = $result->fetch_assoc()) { ?>
-                <tr>
 
-                    <td><?php echo $row['id']; ?></td>
-                    <td><?php echo $row['first_name'] . ' ' . $row['last_name']; ?></td>
-                    <td><?php echo $row['email']; ?></td>
-                    <td><?php echo $row['phone']; ?></td>
-                    <td><?php echo $row['class_name']; ?></td>
+                    <tr>
 
-                   
-                    <td>
-                        <a href="delete.php?id=<?php echo $row['id']; ?>" 
-                           onclick="return confirm('Are you sure?')"
-                           style="color:red; padding:6px 10px; border-radius:6px; text-decoration:none;">
-                           Delete
-                        </a>
-                        <a href="edit.php?id=<?php echo $row['id']; ?>" 
-                           style="color:green;padding:6px 10px;border-radius:6px;text-decoration:none;margin-right:5px;">
-                          Edit
-</a> 
-                    </td>
+                        <td><?= htmlspecialchars($row['id']) ?></td>
 
-                </tr>
+                        <td>
+                            <?= htmlspecialchars($row['first_name']) ?>
+                            <?= htmlspecialchars($row['last_name']) ?>
+                        </td>
+
+                        <td><?= htmlspecialchars($row['email']) ?></td>
+
+                        <td><?= htmlspecialchars($row['phone']) ?></td>
+
+                        <td><?= htmlspecialchars($row['class_name']) ?></td>
+
+                        <td>
+
+                            <div class="actions">
+
+                                <a
+                                    href="edit.php?id=<?= $row['id'] ?>"
+                                    class="btn-edit">
+                                    Edit
+                                </a>
+
+                                <a
+                                    href="delete.php?id=<?= $row['id'] ?>"
+                                    class="btn-delete"
+                                    onclick="return confirm('Are you sure you want to delete this student?')">
+                                    Delete
+                                </a>
+
+                            </div>
+
+                        </td>
+
+                    </tr>
+
                 <?php } ?>
 
-            </tbody>
+                </tbody>
 
-        </table>
+            </table>
+
+        </div>
 
     </div>
 
