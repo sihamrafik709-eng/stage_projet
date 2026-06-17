@@ -1,6 +1,29 @@
 <?php
 session_start();
 include("../config/db.php");
+
+$message = "";
+$username = "";
+
+if (isset($_POST['login'])) {
+    $username = trim($_POST['username']);
+    $password = $_POST['password'];
+
+    $stmt = $conn->prepare("SELECT * FROM users WHERE username = ? AND password = ?");
+    $stmt->bind_param("ss", $username, $password);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    if ($result->num_rows > 0) {
+        $user = $result->fetch_assoc();
+        $_SESSION['user'] = $user['username'];
+
+        header("Location: ../dashboard/index.php");
+        exit();
+    } else {
+        $message = "Wrong username or password.";
+    }
+}
 ?>
 
 <!DOCTYPE html>
@@ -9,185 +32,374 @@ include("../config/db.php");
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Login</title>
-
+<link rel="stylesheet" href="../assets/css/style.css">
 <style>
+    :root {
+        --bg-page: #eef1f6;
+        --surface: #ffffff;
+        --navy-900: #16213e;
+        --navy-700: #2c3e67;
+        --gold-500: #b8902a;
+        --slate-700: #334155;
+        --slate-400: #94a3b8;
+        --red-600: #c0392b;
+        --red-050: #fdecea;
+    }
 
+    * {
+        box-sizing: border-box;
+    }
 
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-    font-family:Arial;
-}
+    body {
+        margin: 0;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--bg-page);
+        padding: 24px;
+    }
 
-body{
-    height:100vh;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    background:linear-gradient(-45deg,#4facfe,#00f2fe,#43e97b,#38f9d7);
-    background-size:400% 400%;
-    animation:bg 12s ease infinite;
-    overflow:hidden;
-}
+    .login-shell {
+        width: 100%;
+        max-width: 920px;
+        min-height: 540px;
+        display: flex;
+        background: var(--surface);
+        border-radius: 16px;
+        box-shadow: 0 20px 50px rgba(22, 33, 62, 0.16);
+        overflow: hidden;
+        animation: rise 0.6s ease;
+    }
 
-@keyframes bg{
-    0%{background-position:0% 50%;}
-    50%{background-position:100% 50%;}
-    100%{background-position:0% 50%;}
-}
+    @keyframes rise {
+        from { opacity: 0; transform: translateY(16px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
 
-.particles{
-    position:fixed;
-    width:100%;
-    height:100%;
-    top:0;
-    left:0;
-    z-index:0;
-    overflow:hidden;
-}
+    /* ---------- Brand panel ---------- */
 
-.particles span{
-    position:absolute;
-    width:6px;
-    height:6px;
-    background:white;
-    border-radius:50%;
-    opacity:0.5;
-    animation:float linear infinite;
-}
+    .brand-panel {
+        position: relative;
+        flex: 0 0 42%;
+        background: linear-gradient(165deg, var(--navy-900) 0%, var(--navy-700) 100%);
+        padding: 48px 40px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        color: #ffffff;
+        overflow: hidden;
+    }
 
-@keyframes float{
-    from{transform:translateY(100vh);}
-    to{transform:translateY(-10vh);}
-}
+    .brand-panel::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background-image: repeating-linear-gradient(
+            to bottom,
+            rgba(184, 144, 42, 0.08) 0px,
+            rgba(184, 144, 42, 0.08) 1px,
+            transparent 1px,
+            transparent 34px
+        );
+        pointer-events: none;
+    }
 
-.login-box{
-    width:500px;
-    background:white;
-    padding:35px;
-    border-radius:20px;
-    box-shadow:0 10px 30px rgba(0,0,0,0.2);
-    position:relative;
-    z-index:2;
-    animation:show 0.7s ease;
-}
+    .brand-seal {
+        position: relative;
+        z-index: 1;
+        width: 64px;
+        height: 64px;
+        border-radius: 50%;
+        border: 1.5px solid var(--gold-500);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 28px;
+        margin-bottom: 24px;
+    }
 
-@keyframes show{
-    from{transform:translateY(-30px);opacity:0;}
-    to{transform:translateY(0);opacity:1;}
-}
+    .brand-seal::after {
+        content: "";
+        position: absolute;
+        inset: -8px;
+        border: 1px solid rgba(184, 144, 42, 0.4);
+        border-radius: 50%;
+    }
 
-.login-box h1{
-    text-align:center;
-    margin-bottom:10px;
-    color:#333;
-}
+    .brand-title {
+        position: relative;
+        z-index: 1;
+        font-size: 24px;
+        font-weight: 800;
+        letter-spacing: -0.01em;
+        margin: 0 0 12px;
+        line-height: 1.3;
+    }
 
-.login-box p{
-    text-align:center;
-    margin-bottom:20px;
-    color:#777;
-}
+    .brand-tagline {
+        position: relative;
+        z-index: 1;
+        font-size: 14px;
+        line-height: 1.6;
+        color: rgba(255, 255, 255, 0.7);
+        margin: 0 0 28px;
+        max-width: 320px;
+    }
 
-.login-box input{
-    width:100%;
-    padding:14px;
-    margin-bottom:15px;
-    border:1px solid #ddd;
-    border-radius:10px;
-    font-size:15px;
-}
+    .brand-divider {
+        position: relative;
+        z-index: 1;
+        width: 40px;
+        height: 2px;
+        background: var(--gold-500);
+        margin-bottom: 24px;
+    }
 
-.login-box input:focus{
-    border-color:#4facfe;
-    box-shadow:0 0 10px rgba(79,172,254,0.3);
-    outline:none;
-}
+    .brand-features {
+        position: relative;
+        z-index: 1;
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        font-size: 13px;
+        color: rgba(255, 255, 255, 0.85);
+    }
 
-.login-box button{
-    width:100%;
-    padding:14px;
-    border:none;
-    border-radius:10px;
-    background:#4facfe;
-    color:white;
-    font-size:16px;
-    cursor:pointer;
-    transition:0.3s;
-}
+    .brand-features li {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 12px;
+    }
 
-.login-box button:hover{
-    transform:scale(1.03);
-    background:#3a8dde;
-}
+    .brand-features li::before {
+        content: "✓";
+        color: var(--gold-500);
+        font-weight: 700;
+    }
 
-.error{
-    background:#ffe5e5;
-    color:red;
-    padding:10px;
-    border-radius:8px;
-    margin-bottom:15px;
-    text-align:center;
-}
+    /* ---------- Form panel ---------- */
 
+    .form-panel {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 48px 44px;
+    }
+
+    .form-panel-inner {
+        width: 100%;
+        max-width: 320px;
+    }
+
+    .page-eyebrow {
+        display: block;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--gold-500);
+        margin-bottom: 8px;
+    }
+
+    .title {
+        font-size: 28px;
+        font-weight: 800;
+        letter-spacing: -0.01em;
+        color: var(--navy-900);
+        margin: 0 0 10px;
+    }
+
+    .title-rule {
+        width: 56px;
+        height: 3px;
+        background: var(--gold-500);
+        border: none;
+        margin: 0 0 12px;
+    }
+
+    .page-meta {
+        font-size: 14px;
+        color: var(--slate-400);
+        margin-bottom: 24px;
+    }
+
+    .message {
+        font-size: 14px;
+        padding: 10px 14px;
+        border-radius: 8px;
+        margin-bottom: 18px;
+        border: 1px solid transparent;
+    }
+
+    .message.error {
+        background: var(--red-050);
+        border-color: var(--red-600);
+        color: var(--red-600);
+    }
+
+    .field-label {
+        display: block;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--slate-700);
+        margin-bottom: 8px;
+    }
+
+    input[type="text"],
+    input[type="password"] {
+        width: 100%;
+        padding: 11px 14px;
+        font-size: 15px;
+        color: var(--navy-900);
+        border: 1.5px solid #dde2ec;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        transition: border-color 0.15s ease;
+    }
+
+    input[type="text"]:focus,
+    input[type="password"]:focus {
+        outline: none;
+        border-color: var(--navy-700);
+    }
+
+    .btn-primary {
+        width: 100%;
+        background: var(--navy-700);
+        color: #ffffff;
+        border: none;
+        padding: 13px 22px;
+        font-size: 14px;
+        font-weight: 600;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: background 0.15s ease;
+    }
+
+    .btn-primary:hover {
+        background: var(--navy-900);
+    }
+
+    .form-footnote {
+        margin-top: 20px;
+        font-size: 12px;
+        color: var(--slate-400);
+        text-align: center;
+    }
+
+    @media (max-width: 760px) {
+        .login-shell {
+            flex-direction: column;
+            min-height: 0;
+        }
+
+        .brand-panel {
+            flex: none;
+            padding: 32px 28px;
+        }
+
+        .brand-tagline,
+        .brand-features {
+            display: none;
+        }
+
+        .form-panel {
+            padding: 36px 28px;
+        }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .login-shell {
+            animation: none;
+        }
+    }
 </style>
 </head>
-
 <body>
 
-<div class="particles"></div>
+<div class="login-shell">
 
-<div class="login-box">
+    <div class="brand-panel">
+        <div class="brand-seal">🎓</div>
+        <h1 class="brand-title">Système de Gestion des Étudiants</h1>
+        <p class="brand-tagline">A unified platform for managing students, teachers, subjects, and grades.</p>
+        <div class="brand-divider"></div>
+        <ul class="brand-features">
+            <li>Real-time grade tracking</li>
+            <li>Simplified class management</li>
+            <li>Secure, role-based access</li>
+        </ul>
+    </div>
 
-    <h1>🎓 Système  Gestion des Étudiants </h1>
-    <p>Welcome Back</p>
+    <div class="form-panel">
+        <div class="form-panel-inner">
 
-<?php
-if (isset($_POST['login'])) {
+            <span class="page-eyebrow">School Records</span>
+            <h1 class="title">Sign In</h1>
+            <hr class="title-rule">
+            <div class="page-meta">Enter your credentials to access your dashboard.</div>
 
-    $username = $_POST['username'];
-    $password = $_POST['password'];
+            <?php if (!empty($message)) { ?>
+                <div class="message error" id="msg">
+                    <?php echo htmlspecialchars($message); ?>
+                </div>
+            <?php } ?>
 
-    $sql = "SELECT * FROM users WHERE username='$username' AND password='$password'";
-    $result = $conn->query($sql);
+            <form method="POST">
 
-    if ($result->num_rows > 0) {
+                <label class="field-label" for="username">Username</label>
+                <input
+                    type="text"
+                    id="username"
+                    name="username"
+                    placeholder="Enter your username"
+                    value="<?php echo htmlspecialchars($username); ?>"
+                    required
+                    autofocus
+                >
 
-        $user = $result->fetch_assoc();
-        $_SESSION['user'] = $user['username'];
+                <label class="field-label" for="password">Password</label>
+                <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    placeholder="Enter your password"
+                    required
+                >
 
-        header("Location: ../dashboard/index.php");
-        exit();
+                <button type="submit" name="login" class="btn-primary">
+                    Sign In
+                </button>
 
-    } else {
-        echo '<div class="error">Wrong username or password</div>';
-    }
-}
-?>
+            </form>
 
-<form method="POST">
+            <div class="form-footnote">Authorized personnel only.</div>
 
-    <input type="text" name="username" placeholder="Username" required>
-
-    <input type="password" name="password" placeholder="Password" required>
-
-    <button type="submit" name="login">Login</button>
-
-</form>
+        </div>
+    </div>
 
 </div>
 
-<script>
-for(let i=0;i<50;i++){
-    let span = document.createElement("span");
-    span.style.left = Math.random()*100 + "vw";
-    span.style.animationDuration = (4 + Math.random()*6) + "s";
-    span.style.opacity = Math.random();
-    span.style.position = "absolute";
+<script src="../assets/js/script.js"></script>
 
-    document.querySelector(".particles").appendChild(span);
-}
+<script>
+setTimeout(function(){
+    let msg = document.getElementById("msg");
+
+    if(msg){
+        msg.style.transition = "opacity 0.5s ease";
+        msg.style.opacity = "0";
+
+        setTimeout(() => {
+            msg.remove();
+        }, 500);
+    }
+}, 3000);
 </script>
 
 </body>
