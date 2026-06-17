@@ -77,7 +77,6 @@ if (isset($_POST['login'])) {
         to { opacity: 1; transform: translateY(0); }
     }
 
-    /* ---------- Brand panel ---------- */
 
     .brand-panel {
         position: relative;
@@ -179,7 +178,6 @@ if (isset($_POST['login'])) {
         font-weight: 700;
     }
 
-    /* ---------- Form panel ---------- */
 
     .form-panel {
         flex: 1;

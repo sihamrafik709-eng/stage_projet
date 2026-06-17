@@ -1,7 +1,6 @@
 <?php
 session_start();
 
-// destroy session
 $_SESSION = [];
 session_destroy();
 ?>
@@ -157,7 +156,6 @@ function goLogin(){
     window.location.href = "login.php";
 }
 
-// countdown + auto redirect
 let secondsLeft = 3;
 const countdownEl = document.getElementById("countdown");
 
