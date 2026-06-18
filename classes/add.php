@@ -182,6 +182,10 @@ if (isset($_POST['add'])) {
     .btn-back:hover {
         color: var(--navy-700);
     }
+    .top-actions{
+    margin-bottom:20px;
+}
+
 </style>
 </head>
 <body>
@@ -194,7 +198,6 @@ if (isset($_POST['add'])) {
         <hr class="title-rule">
         <div class="page-meta">Create a new class for your school records.</div>
     </div>
-
     <div class="card">
 
         <?php if (!empty($message)) { ?>
