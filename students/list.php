@@ -1,3 +1,4 @@
+<?php include("../includes/navbar.php"); ?>
 <?php
 include("../config/db.php");
 
@@ -40,6 +41,8 @@ body{
     max-width:1200px;
     margin:50px auto;
     padding:0 20px;
+    margin-left:260px;
+
 }
 
 .page-header{

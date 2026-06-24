@@ -14,16 +14,15 @@ $error = "";
 
 if (isset($_POST['save'])) {
     $student_id = $_POST['student_id'] ?? '';
-    $subject    = trim($_POST['subject'] ?? '');
-    $score      = $_POST['score'] ?? '';
+    $date       = $_POST['date'] ?? '';
+    $status     = $_POST['status'] ?? '';
 
-    if ($student_id === '' || $subject === '' || $score === '') {
+    if ($student_id === '' || $date === '' || $status === '') {
         $error = "Veuillez remplir tous les champs.";
-    } elseif (!is_numeric($score) || $score < 0 || $score > 20) {
-        $error = "La note doit être un nombre entre 0 et 20.";
     } else {
-        $stmt = $conn->prepare("INSERT INTO grades (student_id, subject, score) VALUES (?, ?, ?)");
-        $stmt->bind_param("isd", $student_id, $subject, $score);
+        // Requête préparée — protège contre l'injection SQL
+        $stmt = $conn->prepare("INSERT INTO attendance (student_id, date, status) VALUES (?, ?, ?)");
+        $stmt->bind_param("iss", $student_id, $date, $status);
 
         if ($stmt->execute()) {
             header("Location: list.php");
@@ -40,15 +39,29 @@ if (isset($_POST['save'])) {
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Add Grade — SMS Admin</title>
+<title>Ajouter une présence — SMS Admin</title>
 
 <style>
+    :root{
+        --navy:#0f1b3c;
+        --navy-light:#16213e;
+        --navy-lighter:#1f2a4a;
+        --gold:#c9a44c;
+        --gold-light:#e3c878;
+        --forest:#2e7d4f;
+        --danger:#c0392b;
+        --bg:#f4f5f7;
+        --card-border:#e6e2d6;
+        --text-dark:#1c1f2a;
+        --text-muted:#6b7280;
+    }
+
     *{box-sizing:border-box;}
 
     body{
         margin:0;
         font-family:'Segoe UI', Arial, sans-serif;
-        background:#f4f5f7;
+        background:var(--bg);
         min-height:100vh;
         display:flex;
         align-items:center;
@@ -62,7 +75,7 @@ if (isset($_POST['save'])) {
         background:#fff;
         padding:32px 30px;
         border-radius:14px;
-        border:1px solid #e6e2d6;
+        border:1px solid var(--card-border);
         box-shadow:0 4px 18px rgba(15,27,60,0.08);
         position:relative;
         overflow:hidden;
@@ -71,19 +84,17 @@ if (isset($_POST['save'])) {
     .container::before{
         content:"";
         position:absolute;
-        top:0;
-        left:0;
-        right:0;
+        top:0; left:0; right:0;
         height:5px;
-        background:linear-gradient(90deg, #0f1b3c, #c9a44c);
+        background:linear-gradient(90deg, var(--navy), var(--gold));
     }
 
     .header-icon{
         width:54px;
         height:54px;
         border-radius:12px;
-        background:#f1edfb;
-        color:#6d4fc7;
+        background:#fdf1e7;
+        color:#c9821f;
         display:flex;
         align-items:center;
         justify-content:center;
@@ -93,14 +104,14 @@ if (isset($_POST['save'])) {
 
     h2{
         text-align:center;
-        color:#0f1b3c;
+        color:var(--navy);
         margin:0 0 4px 0;
         font-size:21px;
     }
 
     .subtitle{
         text-align:center;
-        color:#6b7280;
+        color:var(--text-muted);
         font-size:13.5px;
         margin-bottom:24px;
     }
@@ -109,16 +120,15 @@ if (isset($_POST['save'])) {
         display:block;
         font-size:13px;
         font-weight:600;
-        color:#0f1b3c;
+        color:var(--navy);
         margin-bottom:6px;
         margin-top:16px;
     }
 
-    input,
-    select{
+    input, select{
         width:100%;
         padding:11px 12px;
-        border:1px solid #e6e2d6;
+        border:1px solid var(--card-border);
         border-radius:8px;
         font-size:14px;
         font-family:inherit;
@@ -126,10 +136,9 @@ if (isset($_POST['save'])) {
         transition:border-color .2s ease;
     }
 
-    input:focus,
-    select:focus{
+    input:focus, select:focus{
         outline:none;
-        border-color:#c9a44c;
+        border-color:var(--gold);
         background:#fff;
     }
 
@@ -137,7 +146,7 @@ if (isset($_POST['save'])) {
         width:100%;
         padding:12px;
         margin-top:24px;
-        background:#16213e;
+        background:var(--navy-light);
         color:#fff;
         border:none;
         border-radius:8px;
@@ -149,12 +158,12 @@ if (isset($_POST['save'])) {
     }
 
     button:hover{
-        background:#0f1b3c;
+        background:var(--navy);
     }
 
     .error-box{
         background:#fdecea;
-        color:#c0392b;
+        color:var(--danger);
         border:1px solid #f5c6c0;
         padding:10px 14px;
         border-radius:8px;
@@ -167,12 +176,12 @@ if (isset($_POST['save'])) {
         text-align:center;
         margin-top:18px;
         font-size:13px;
-        color:#6b7280;
+        color:var(--text-muted);
         text-decoration:none;
     }
 
     .back-link:hover{
-        color:#0f1b3c;
+        color:var(--navy);
     }
 </style>
 </head>
@@ -181,9 +190,9 @@ if (isset($_POST['save'])) {
 
 <div class="container">
 
-    <div class="header-icon">📈</div>
-    <h2>Add Grade </h2>
-    <p class="subtitle">Record a student's grade in a subject </p>
+    <div class="header-icon">✅</div>
+    <h2>Ajouter une présence</h2>
+    <p class="subtitle">Enregistrer le statut de présence d'un étudiant</p>
 
     <?php if ($error): ?>
         <div class="error-box"><?php echo htmlspecialchars($error); ?></div>
@@ -191,9 +200,9 @@ if (isset($_POST['save'])) {
 
     <form method="POST">
 
-        <label for="student_id">Student</label>
+        <label for="student_id">Étudiant</label>
         <select id="student_id" name="student_id" required>
-            <option value="">Select a Student </option>
+            <option value="">Sélectionner un étudiant</option>
             <?php while ($row = $students->fetch_assoc()): ?>
                 <option value="<?php echo (int)$row['id']; ?>">
                     <?php echo htmlspecialchars($row['first_name'] . " " . $row['last_name']); ?>
@@ -201,24 +210,20 @@ if (isset($_POST['save'])) {
             <?php endwhile; ?>
         </select>
 
-        <label for="subject">Subject </label>
-        <select id="subject" name="subject" required>
-            <option value="">Select a Student</option>
-            <option value="Math">Mathematics</option>
-            <option value="Francais">French </option>
-            <option value="Histoire">History</option>
-            <option value="Sciences">Science</option>
-            <option value="Anglais">English</option>
+        <label for="date">Date</label>
+        <input type="date" id="date" name="date" required>
+
+        <label for="status">Statut</label>
+        <select id="status" name="status" required>
+            <option value="present">Présent</option>
+            <option value="absent">Absent</option>
         </select>
 
-        <label for="score">Grade (out of 20)</label>
-        <input type="number" id="score" name="score" min="0" max="20" step="0.25" required>
-
-        <button type="submit" name="save">Save</button>
+        <button type="submit" name="save">Enregistrer</button>
 
     </form>
 
-    <a href="list.php" class="back-link">← Back to Grades List</a>
+    <a href="list.php" class="back-link">← Retour à la liste des présences</a>
 
 </div>
 

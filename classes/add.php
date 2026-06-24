@@ -1,3 +1,4 @@
+<?php include("../includes/navbar.php"); ?>
 <?php
 include("../config/db.php");
 
@@ -213,7 +214,7 @@ if (isset($_POST['add'])) {
                 type="text"
                 id="name"
                 name="name"
-                placeholder="e.g. Grade 10 - Section A"
+                placeholder="Exemple : eng"
                 value="<?php echo htmlspecialchars($name); ?>"
                 required
                 autofocus

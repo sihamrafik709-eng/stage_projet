@@ -17,6 +17,7 @@ if (isset($_POST['login'])) {
     if ($result->num_rows > 0) {
         $user = $result->fetch_assoc();
         $_SESSION['user'] = $user['username'];
+        $_SESSION['role'] = $user['role'] ;
 
         header("Location: ../dashboard/index.php");
         exit();

@@ -8,9 +8,10 @@ if (!isset($_SESSION['user'])) {
     exit();
 }
 
+// --- Suppression d'une présence ---
 if (isset($_GET['delete'])) {
     $deleteId = (int) $_GET['delete'];
-    $stmt = $conn->prepare("DELETE FROM grades WHERE id = ?");
+    $stmt = $conn->prepare("DELETE FROM attendance WHERE id = ?");
     $stmt->bind_param("i", $deleteId);
     $stmt->execute();
     $stmt->close();
@@ -18,10 +19,10 @@ if (isset($_GET['delete'])) {
     exit();
 }
 
-$sql = "SELECT grades.*, students.first_name, students.last_name
-        FROM grades
-        JOIN students ON grades.student_id = students.id
-        ORDER BY grades.id DESC";
+$sql = "SELECT attendance.*, students.first_name, students.last_name
+        FROM attendance
+        JOIN students ON attendance.student_id = students.id
+        ORDER BY attendance.date DESC";
 
 $result = $conn->query($sql);
 ?>
@@ -30,16 +31,29 @@ $result = $conn->query($sql);
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>List of Grades — SMS Admin</title>
+<title>Liste des présences — SMS Admin</title>
+
 <style>
+    :root{
+        --navy:#0f1b3c;
+        --navy-light:#16213e;
+        --gold:#c9a44c;
+        --gold-light:#e3c878;
+        --forest:#2e7d4f;
+        --danger:#c0392b;
+        --bg:#f4f5f7;
+        --card-border:#e6e2d6;
+        --text-dark:#1c1f2a;
+        --text-muted:#6b7280;
+    }
 
     *{box-sizing:border-box;}
 
     body{
         margin:0;
         font-family:'Segoe UI', Arial, sans-serif;
-        background:#f4f5f7;
-        color:#1c1f2a;
+        background:var(--bg);
+        color:var(--text-dark);
     }
 
     .container{
@@ -58,13 +72,13 @@ $result = $conn->query($sql);
     }
 
     h2{
-        color:#0f1b3c;
+        color:var(--navy);
         margin:0;
         font-size:22px;
     }
 
     .add-btn{
-        background:#16213e;
+        background:var(--navy-light);
         color:#fff;
         text-decoration:none;
         padding:10px 18px;
@@ -75,7 +89,7 @@ $result = $conn->query($sql);
     }
 
     .add-btn:hover{
-        background:#0f1b3c;
+        background:var(--navy);
     }
 
     .search-box{
@@ -87,7 +101,7 @@ $result = $conn->query($sql);
         width:100%;
         max-width:320px;
         padding:11px 14px 11px 38px;
-        border:1px solid #e6e2d6;
+        border:1px solid var(--card-border);
         border-radius:8px;
         font-size:14px;
         background:#fff url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="%236b7280" viewBox="0 0 16 16"><path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/></svg>') no-repeat 12px center;
@@ -96,13 +110,13 @@ $result = $conn->query($sql);
 
     .search-box input:focus{
         outline:none;
-        border-color:#c9a44c;
+        border-color:var(--gold);
     }
 
     .panel{
         background:#fff;
         border-radius:12px;
-        border:1px solid #e6e2d6;
+        border:1px solid var(--card-border);
         box-shadow:0 2px 6px rgba(15,27,60,0.05);
         overflow:hidden;
     }
@@ -113,7 +127,7 @@ $result = $conn->query($sql);
     }
 
     th{
-        background:#16213e;
+        background:var(--navy-light);
         color:#fff;
         padding:13px 14px;
         text-align:left;
@@ -138,26 +152,22 @@ $result = $conn->query($sql);
         border-radius:20px;
         font-size:12.5px;
         font-weight:700;
+        text-transform:capitalize;
     }
 
-    .badge.good{
+    .badge.present{
         background:#e6f4ea;
-        color:#2e7d4f;
+        color:var(--forest);
     }
 
-    .badge.average{
-        background:#fdf1e7;
-        color:#c9821f;
-    }
-
-    .badge.low{
+    .badge.absent{
         background:#fdecea;
-        color:#c0392b;
+        color:var(--danger);
     }
 
     .empty-row td{
         text-align:center;
-        color:#6b7280;
+        color:var(--text-muted);
         padding:24px;
     }
 
@@ -185,11 +195,18 @@ $result = $conn->query($sql);
         color:white;
     }
 
+    .btn-edit:hover{
+        background:green;
+    }
+
     .btn-delete{
         background:red;
         color:white;
     }
 
+    .btn-delete:hover{
+        background:red;
+    }
 </style>
 
 </head>
@@ -199,53 +216,47 @@ $result = $conn->query($sql);
 <div class="container">
 
     <div class="top-bar">
-        <h2>List of Grades</h2>
-        <a href="add.php" class="add-btn">+ Add Grade</a>
+        <h2>Liste des présences</h2>
+        <a href="add.php" class="add-btn">+ Ajouter une présence</a>
     </div>
 
     <div class="search-box">
-        <input type="text" id="search" placeholder="Rechercher un étudiant ou une matière...">
+        <input type="text" id="search" placeholder="Rechercher un étudiant...">
     </div>
 
     <div class="panel">
         <table id="table">
             <thead>
             <tr>
-                <th>Student</th>
-                <th>Subject</th>
-                <th>Grade</th>
+                <th>Étudiant</th>
+                <th>Date</th>
+                <th>Statut</th>
                 <th>Action</th>
             </tr>
             </thead>
             <tbody>
             <?php if ($result->num_rows === 0): ?>
                 <tr class="empty-row">
-                    <td colspan="4">No Grades have been recorded yet.</td>
+                    <td colspan="4">Aucune présence enregistrée pour le moment.</td>
                 </tr>
             <?php else: ?>
                 <?php while ($row = $result->fetch_assoc()):
-                    $score = (float) $row['score'];
-                    if ($score >= 14) {
-                        $badgeClass = 'Bon';
-                    } elseif ($score >= 10) {
-                        $badgeClass = 'Moyen';
-                    } else {
-                        $badgeClass = 'Faible';
-                    }
+                    $status = $row['status'];
+                    $statusLabel = $status === 'present' ? 'Présent' : 'Absent';
                 ?>
                 <tr>
                     <td><?php echo htmlspecialchars($row['first_name'] . " " . $row['last_name']); ?></td>
-                    <td><?php echo htmlspecialchars($row['subject']); ?></td>
+                    <td><?php echo htmlspecialchars($row['date']); ?></td>
                     <td>
-                        <span class="badge <?php echo $badgeClass; ?>">
-                            <?php echo htmlspecialchars($row['score']); ?>/20
+                        <span class="badge <?php echo htmlspecialchars($status); ?>">
+                            <?php echo htmlspecialchars($statusLabel); ?>
                         </span>
                     </td>
                     <td>
                         <div class="actions">
-                            <a class="btn-action btn-edit" href="edit.php?id=<?php echo (int)$row['id']; ?>"> Edit</a>
+                            <a class="btn-action btn-edit" href="Edit.php?id=<?php echo (int)$row['id']; ?>"> Modifier</a>
                             <button type="button" class="btn-action btn-delete"
-                                onclick="confirmDelete(<?php echo (int)$row['id']; ?>)">Delete </button>
+                                onclick="confirmDelete(<?php echo (int)$row['id']; ?>)"> Supprimer</button>
                         </div>
                     </td>
                 </tr>
@@ -269,7 +280,7 @@ document.getElementById("search").addEventListener("keyup", function(){
 });
 
 function confirmDelete(id){
-    if (confirm("Voulez-vous vraiment supprimer cette note ?")) {
+    if (confirm("Voulez-vous vraiment supprimer cette présence ?")) {
         window.location.href = "list.php?delete=" + id;
     }
 }

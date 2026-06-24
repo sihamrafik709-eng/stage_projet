@@ -1,3 +1,4 @@
+<?php include("../includes/navbar.php"); ?>
 <?php
 include("../config/db.php");
 
@@ -86,7 +87,7 @@ $count = $result->num_rows;
     }
 
     thead {
-        background: var(--navy-700);
+        background: #0f1b3c;
     }
 
     thead th {

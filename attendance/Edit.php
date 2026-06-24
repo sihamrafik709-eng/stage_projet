@@ -17,18 +17,17 @@ if ($id === 0) {
 
 $error = "";
 
+// --- Mise à jour ---
 if (isset($_POST['save'])) {
     $student_id = $_POST['student_id'] ?? '';
-    $subject    = trim($_POST['subject'] ?? '');
-    $score      = $_POST['score'] ?? '';
+    $date       = $_POST['date'] ?? '';
+    $status     = $_POST['status'] ?? '';
 
-    if ($student_id === '' || $subject === '' || $score === '') {
+    if ($student_id === '' || $date === '' || $status === '') {
         $error = "Veuillez remplir tous les champs.";
-    } elseif (!is_numeric($score) || $score < 0 || $score > 20) {
-        $error = "La note doit être un nombre entre 0 et 20.";
     } else {
-        $stmt = $conn->prepare("UPDATE grades SET student_id = ?, subject = ?, score = ? WHERE id = ?");
-        $stmt->bind_param("isdi", $student_id, $subject, $score, $id);
+        $stmt = $conn->prepare("UPDATE attendance SET student_id = ?, date = ?, status = ? WHERE id = ?");
+        $stmt->bind_param("issi", $student_id, $date, $status, $id);
 
         if ($stmt->execute()) {
             header("Location: list.php");
@@ -40,33 +39,47 @@ if (isset($_POST['save'])) {
     }
 }
 
-$stmt = $conn->prepare("SELECT * FROM grades WHERE id = ?");
+// --- Récupération de la présence existante ---
+$stmt = $conn->prepare("SELECT * FROM attendance WHERE id = ?");
 $stmt->bind_param("i", $id);
 $stmt->execute();
-$grade = $stmt->get_result()->fetch_assoc();
+$attendance = $stmt->get_result()->fetch_assoc();
 $stmt->close();
 
-if (!$grade) {
+if (!$attendance) {
     header("Location: list.php");
     exit();
 }
 
 $students = $conn->query("SELECT * FROM students ORDER BY first_name");
-$subjects = ["Maths", "Français", "Histoire", "Sciences", "Anglais"];
 ?>
 <!DOCTYPE html>
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Edit Grade — SMS Admin</title>
+<title>Modifier une présence — SMS Admin</title>
+
 <style>
+    :root{
+        --navy:#0f1b3c;
+        --navy-light:#16213e;
+        --gold:#c9a44c;
+        --gold-light:#e3c878;
+        --forest:#2e7d4f;
+        --danger:#c0392b;
+        --bg:#f4f5f7;
+        --card-border:#e6e2d6;
+        --text-dark:#1c1f2a;
+        --text-muted:#6b7280;
+    }
+
     *{box-sizing:border-box;}
 
     body{
         margin:0;
         font-family:'Segoe UI', Arial, sans-serif;
-        background:#f4f5f7;
+        background:var(--bg);
         min-height:100vh;
         display:flex;
         align-items:center;
@@ -80,7 +93,7 @@ $subjects = ["Maths", "Français", "Histoire", "Sciences", "Anglais"];
         background:#fff;
         padding:32px 30px;
         border-radius:14px;
-        border:1px solid #e6e2d6;
+        border:1px solid var(--card-border);
         box-shadow:0 4px 18px rgba(15,27,60,0.08);
         position:relative;
         overflow:hidden;
@@ -89,19 +102,17 @@ $subjects = ["Maths", "Français", "Histoire", "Sciences", "Anglais"];
     .container::before{
         content:"";
         position:absolute;
-        top:0;
-        left:0;
-        right:0;
+        top:0; left:0; right:0;
         height:5px;
-        background:linear-gradient(90deg, #0f1b3c, #c9a44c);
+        background:linear-gradient(90deg, var(--navy), var(--gold));
     }
 
     .header-icon{
         width:54px;
         height:54px;
         border-radius:12px;
-        background:#f1edfb;
-        color:#6d4fc7;
+        background:#fdf1e7;
+        color:#c9821f;
         display:flex;
         align-items:center;
         justify-content:center;
@@ -111,14 +122,14 @@ $subjects = ["Maths", "Français", "Histoire", "Sciences", "Anglais"];
 
     h2{
         text-align:center;
-        color:#0f1b3c;
+        color:var(--navy);
         margin:0 0 4px 0;
         font-size:21px;
     }
 
     .subtitle{
         text-align:center;
-        color:#6b7280;
+        color:var(--text-muted);
         font-size:13.5px;
         margin-bottom:24px;
     }
@@ -127,16 +138,15 @@ $subjects = ["Maths", "Français", "Histoire", "Sciences", "Anglais"];
         display:block;
         font-size:13px;
         font-weight:600;
-        color:#0f1b3c;
+        color:var(--navy);
         margin-bottom:6px;
         margin-top:16px;
     }
 
-    input,
-    select{
+    input, select{
         width:100%;
         padding:11px 12px;
-        border:1px solid #e6e2d6;
+        border:1px solid var(--card-border);
         border-radius:8px;
         font-size:14px;
         font-family:inherit;
@@ -144,10 +154,9 @@ $subjects = ["Maths", "Français", "Histoire", "Sciences", "Anglais"];
         transition:border-color .2s ease;
     }
 
-    input:focus,
-    select:focus{
+    input:focus, select:focus{
         outline:none;
-        border-color:#c9a44c;
+        border-color:var(--gold);
         background:#fff;
     }
 
@@ -157,8 +166,7 @@ $subjects = ["Maths", "Français", "Histoire", "Sciences", "Anglais"];
         margin-top:24px;
     }
 
-    button,
-    .btn-cancel{
+    button, .btn-cancel{
         flex:1;
         padding:12px;
         border:none;
@@ -173,18 +181,18 @@ $subjects = ["Maths", "Français", "Histoire", "Sciences", "Anglais"];
     }
 
     button{
-        background:#16213e;
+        background:var(--navy-light);
         color:#fff;
         transition:background .2s ease;
     }
 
     button:hover{
-        background:#0f1b3c;
+        background:var(--navy);
     }
 
     .btn-cancel{
         background:#f1f1f1;
-        color:#6b7280;
+        color:var(--text-muted);
     }
 
     .btn-cancel:hover{
@@ -193,7 +201,7 @@ $subjects = ["Maths", "Français", "Histoire", "Sciences", "Anglais"];
 
     .error-box{
         background:#fdecea;
-        color:#c0392b;
+        color:var(--danger);
         border:1px solid #f5c6c0;
         padding:10px 14px;
         border-radius:8px;
@@ -208,8 +216,8 @@ $subjects = ["Maths", "Français", "Histoire", "Sciences", "Anglais"];
 <div class="container">
 
     <div class="header-icon">✏️</div>
-    <h2>Edit Grade</h2>
-    <p class="subtitle">Update Student Grade</p>
+    <h2>Modifier une présence</h2>
+    <p class="subtitle">Mettre à jour le statut de présence de l'étudiant</p>
 
     <?php if ($error): ?>
         <div class="error-box"><?php echo htmlspecialchars($error); ?></div>
@@ -217,33 +225,29 @@ $subjects = ["Maths", "Français", "Histoire", "Sciences", "Anglais"];
 
     <form method="POST">
 
-        <label for="student_id">Student</label>
+        <label for="student_id">Étudiant</label>
         <select id="student_id" name="student_id" required>
             <?php while ($row = $students->fetch_assoc()): ?>
                 <option value="<?php echo (int)$row['id']; ?>"
-                    <?php echo ((int)$row['id'] === (int)$grade['student_id']) ? 'selected' : ''; ?>>
+                    <?php echo ((int)$row['id'] === (int)$attendance['student_id']) ? 'selected' : ''; ?>>
                     <?php echo htmlspecialchars($row['first_name'] . " " . $row['last_name']); ?>
                 </option>
             <?php endwhile; ?>
         </select>
 
-        <label for="subject">Subject</label>
-        <select id="subject" name="subject" required>
-            <?php foreach ($subjects as $subj): ?>
-                <option value="<?php echo htmlspecialchars($subj); ?>"
-                    <?php echo ($grade['subject'] === $subj) ? 'selected' : ''; ?>>
-                    <?php echo htmlspecialchars($subj); ?>
-                </option>
-            <?php endforeach; ?>
+        <label for="date">Date</label>
+        <input type="date" id="date" name="date" required
+            value="<?php echo htmlspecialchars($attendance['date']); ?>">
+
+        <label for="status">Statut</label>
+        <select id="status" name="status" required>
+            <option value="present" <?php echo $attendance['status'] === 'present' ? 'selected' : ''; ?>>Présent</option>
+            <option value="absent" <?php echo $attendance['status'] === 'absent' ? 'selected' : ''; ?>>Absent</option>
         </select>
 
-        <label for="score">Grades (out of 20)</label>
-        <input type="number" id="score" name="score" min="0" max="20" step="0.25" required
-            value="<?php echo htmlspecialchars($grade['score']); ?>">
-
         <div class="btn-row">
-            <a href="list.php" class="btn-cancel">Cancel</a>
-            <button type="submit" name="save">Save</button>
+            <a href="list.php" class="btn-cancel">Annuler</a>
+            <button type="submit" name="save">Enregistrer</button>
         </div>
 
     </form>
