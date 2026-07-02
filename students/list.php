@@ -1,7 +1,13 @@
-<?php include("../includes/navbar.php"); ?>
+<?php 
+session_start();
+include("../includes/navbar.php"); ?>
 <?php
-include("../config/db.php");
 
+if(!isset($_SESSION['user'])){
+    header("Location: ../auth/login.php");
+    exit();
+}
+include("../config/db.php");
 $result = $conn->query("
     SELECT students.*, classes.name AS class_name
     FROM students
@@ -14,35 +20,22 @@ $result = $conn->query("
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Students List</title>
+<title>Liste des étudiants</title>
 
 <link rel="stylesheet" href="../assets/css/style.css">
 
 <style>
-:root{
-    --bg-page:#eef1f6;
-    --surface:#ffffff;
-    --navy-900:#16213e;
-    --navy-700:#2c3e67;
-    --gold-500:#b8902a;
-    --slate-400:#94a3b8;
-    --green-600:#15803d;
-    --green-700:#0f5c2c;
-    --red-600:#c0392b;
-}
-
 body{
-    background:var(--bg-page);
+    background:#eef3f8;
     margin:0;
-    font-family:Arial, sans-serif;
+    font-family:Arial,sans-serif;
 }
 
 .container{
     max-width:1200px;
     margin:50px auto;
     padding:0 20px;
-    margin-left:260px;
-
+    margin-left:330px;
 }
 
 .page-header{
@@ -55,33 +48,33 @@ body{
     font-weight:700;
     letter-spacing:.12em;
     text-transform:uppercase;
-    color:var(--gold-500);
+    color:#d4a017;
     margin-bottom:8px;
 }
 
 .title{
     font-size:30px;
     font-weight:800;
-    color:var(--navy-900);
+    color:#16213e;
     margin:0;
 }
 
 .title-rule{
     width:60px;
     height:3px;
-    background:var(--gold-500);
+    background:#d4a017;
     border:none;
     margin:12px 0;
 }
 
 .page-meta{
-    color:var(--slate-400);
+    color:#64748b;
 }
 
 .card{
-    background:var(--surface);
+    background:#ffffff;
     border-radius:12px;
-    box-shadow:0 6px 24px rgba(22,33,62,.08);
+    box-shadow:0 6px 24px rgba(30,58,138,.08);
     overflow:hidden;
 }
 
@@ -95,8 +88,8 @@ table{
 }
 
 thead{
-    background:var(--navy-900);
-    color:white;
+    background:#16213e; ;
+    color:#ffffff;
 }
 
 th{
@@ -109,15 +102,14 @@ td{
     border-bottom:1px solid #e5e7eb;
 }
 
-
 .actions{
     display:flex;
     gap:8px;
 }
 
 .btn-edit{
-    background:var(--green-600);
-    color:white;
+    background:green;
+    color:#ffffff;
     text-decoration:none;
     padding:8px 12px;
     border-radius:6px;
@@ -125,12 +117,12 @@ td{
 }
 
 .btn-edit:hover{
-    background:var(--green-700);
+    background:green;
 }
 
 .btn-delete{
-    background:var(--red-600);
-    color:white;
+    background:#dc2626;
+    color:#ffffff;
     text-decoration:none;
     padding:8px 12px;
     border-radius:6px;
@@ -146,8 +138,8 @@ td{
 }
 
 .btn-add{
-    background:var(--green-600);
-    color:white;
+    background:green; 
+    color:#ffffff;
     text-decoration:none;
     padding:12px 18px;
     border-radius:8px;
@@ -155,7 +147,25 @@ td{
 }
 
 .btn-add:hover{
-    background:var(--green-700);
+    background:green;
+}
+
+.badge{
+    display:inline-block;
+    padding:6px 12px;
+    border-radius:20px;
+    font-size:13px;
+    font-weight:600;
+}
+
+.badge.active{
+    background: #b4f89f;
+    color:green;
+}
+
+.badge.inactive{
+    background:#fee2e2;
+    color:#dc2626;
 }
 </style>
 
@@ -165,16 +175,16 @@ td{
 <div class="container">
 
     <div class="page-header">
-        <span class="page-eyebrow">School Records</span>
-        <h1 class="title">Students List</h1>
+        <span class="page-eyebrow">Dossiers scolaires</span>
+        <h1 class="title">Liste des étudiants</h1>
         <hr class="title-rule">
         <div class="page-meta">
-            Manage all student records.
+           Gérez tous les dossiers des étudiants.
         </div>
     </div>
 
     <div class="top-actions">
-        <a href="add.php" class="btn-add">+ Add Student</a>
+        <a href="add.php" class="btn-add">+ Ajouter un étudiant</a>
     </div>
 
     <div class="card">
@@ -186,10 +196,11 @@ td{
                 <thead>
                     <tr>
                         <th>ID</th>
-                        <th>Full Name</th>
-                        <th>Email</th>
-                        <th>Phone</th>
-                        <th>Class</th>
+                        <th>Nom complet</th>
+                        <th>Adresse e-mail</th>
+                        <th>Téléphone</th>
+                        <th>Classe</th>
+                        <th>Statut</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -212,6 +223,9 @@ td{
                         <td><?= htmlspecialchars($row['phone']) ?></td>
 
                         <td><?= htmlspecialchars($row['class_name']) ?></td>
+                        <td><?php if($row['status'] == 'active'){ ?>
+                        <span class="badge active">Actif</span><?php } else { ?>
+                        <span class="badge inactive">Inactif</span> <?php } ?></td>
 
                         <td>
 
@@ -220,14 +234,14 @@ td{
                                 <a
                                     href="edit.php?id=<?= $row['id'] ?>"
                                     class="btn-edit">
-                                    Edit
+                                    Modifier
                                 </a>
 
                                 <a
                                     href="delete.php?id=<?= $row['id'] ?>"
                                     class="btn-delete"
                                     onclick="return confirm('Are you sure you want to delete this student?')">
-                                    Delete
+                                    Supprimer
                                 </a>
 
                             </div>

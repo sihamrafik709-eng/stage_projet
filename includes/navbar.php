@@ -1,7 +1,11 @@
+<?php
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+?>
 <div class="sidebar">
     <h2>🎓 SMS Admin</h2>
-
-    
+ <?php if($_SESSION['role'] == 'admin'){?>
 
         <a href="../dashboard/index.php">📊 Tableau de bord</a>
         <a href="../students/list.php">🎓 Étudiants</a>
@@ -10,8 +14,13 @@
         <a href="../attendance/list.php">✅ Présences</a>
         <a href="../grades/list.php">📈 Notes</a>
         <a href="../users/list.php">🔐 Users</a>
-
-
+<?php  } ?>
+<?php if($_SESSION['role'] == 'teacher'){?>
+        <a href="../dashboard/index.php">📊 Tableau de bord</a>
+        <a href="../students/list.php">🎓 Étudiants</a>
+        <a href="../attendance/list.php">✅ Présences</a>
+        <a href="../grades/list.php">📈 Notes</a>
+<?php  } ?>
 </div>
 <style>
  .sidebar{

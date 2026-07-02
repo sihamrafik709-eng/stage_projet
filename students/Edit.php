@@ -30,6 +30,7 @@ if (isset($_POST['update'])) {
     $email      = trim($_POST['email']);
     $phone      = trim($_POST['phone']);
     $class_id   = trim($_POST['class_id']);
+    $status  = $_POST['status'];
 
     if ($first_name === "" || $last_name === "" || $class_id === "") {
 
@@ -38,25 +39,30 @@ if (isset($_POST['update'])) {
 
     } else {
 
-        $update = $conn->prepare("
-            UPDATE students
-            SET first_name=?,
-                last_name=?,
-                email=?,
-                phone=?,
-                class_id=?
-            WHERE id=?
-        ");
+        $sql = "UPDATE students
+        SET first_name=?,
+            last_name=?,
+            email=?,
+            phone=?,
+            class_id=?,
+            `status`=?
+        WHERE id=?";
 
+$update = $conn->prepare($sql);
+
+if (!$update) {
+    die($conn->error);
+}
         $update->bind_param(
-            "ssssii",
-            $first_name,
-            $last_name,
-            $email,
-            $phone,
-            $class_id,
-            $id
-        );
+    "ssssisi",
+    $first_name,
+    $last_name,
+    $email,
+    $phone,
+    $class_id,
+    $status,
+    $id
+);
 
         if ($update->execute()) {
 
@@ -83,28 +89,13 @@ if (isset($_POST['update'])) {
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Edit Student</title>
+<title>Modifier un étudiant</title>
 
 <link rel="stylesheet" href="../assets/css/style.css">
 
 <style>
-:root{
-    --bg-page:#eef1f6;
-    --surface:#ffffff;
-    --navy-900:#16213e;
-    --navy-700:#2c3e67;
-    --gold-500:#b8902a;
-    --slate-700:#334155;
-    --slate-400:#94a3b8;
-    --green-600:#15803d;
-    --green-700:#0f5c2c;
-    --green-050:#eafbf0;
-    --red-600:#c0392b;
-    --red-050:#fdecea;
-}
-
 body{
-    background:var(--bg-page);
+    background:#eef3f8;
 }
 
 .container{
@@ -123,13 +114,13 @@ body{
     font-weight:700;
     text-transform:uppercase;
     letter-spacing:.12em;
-    color:var(--gold-500);
+    color:#d4a017;
 }
 
 .title{
     font-size:30px;
     font-weight:800;
-    color:var(--navy-900);
+    color:#16213e;;
     margin:10px 0;
 }
 
@@ -137,18 +128,19 @@ body{
     width:60px;
     height:3px;
     border:none;
-    background:var(--gold-500);
+    background:#d4a017;
+    margin-left: 0px;
 }
 
 .page-meta{
-    color:var(--slate-400);
+    color:#64748b;
 }
 
 .card{
-    background:var(--surface);
+    background:#ffffff;
     padding:30px;
     border-radius:12px;
-    box-shadow:0 6px 24px rgba(22,33,62,.08);
+    box-shadow:0 6px 24px rgba(30,58,138,.08);
 }
 
 .row{
@@ -166,14 +158,14 @@ body{
     font-weight:700;
     text-transform:uppercase;
     margin-bottom:8px;
-    color:var(--slate-700);
+    color:#1e293b;
 }
 
 input,
 select{
     width:100%;
     padding:12px;
-    border:1px solid #dbe1ea;
+    border:1px solid #dbe4f0;
     border-radius:8px;
     box-sizing:border-box;
     margin-bottom:18px;
@@ -182,7 +174,7 @@ select{
 input:focus,
 select:focus{
     outline:none;
-    border-color:var(--navy-700);
+    border-color:#1e3a8a;
 }
 
 .message{
@@ -192,15 +184,15 @@ select:focus{
 }
 
 .success{
-    background:var(--green-050);
-    color:var(--green-700);
-    border:1px solid var(--green-600);
+    background:#dbeafe;
+    color:#2563eb;
+    border:1px solid #2563eb;
 }
 
 .error{
-    background:var(--red-050);
-    color:var(--red-600);
-    border:1px solid var(--red-600);
+    background:#fee2e2;
+    color:#dc2626;
+    border:1px solid #dc2626;
 }
 
 .form-actions{
@@ -211,12 +203,16 @@ select:focus{
 
 .btn-back{
     text-decoration:none;
-    color:var(--slate-400);
+    color:#64748b;
     font-weight:600;
 }
 
+.btn-back:hover{
+    color:#1e3a8a;
+}
+
 .btn-primary{
-    background:var(--green-600);
+    background:green;
     color:white;
     border:none;
     padding:12px 24px;
@@ -226,7 +222,7 @@ select:focus{
 }
 
 .btn-primary:hover{
-    background:var(--green-700);
+    background:green;
 }
 </style>
 
@@ -236,11 +232,11 @@ select:focus{
 <div class="container">
 
     <div class="page-header">
-        <span class="page-eyebrow">School Records</span>
-        <h1 class="title">Edit Student</h1>
+        <span class="page-eyebrow">Dossiers scolaires</span>
+        <h1 class="title">Modifier un étudiant</h1>
         <hr class="title-rule">
         <div class="page-meta">
-            Update student information.
+            Mettre à jour les informations de l'étudiant
         </div>
     </div>
 
@@ -257,14 +253,14 @@ select:focus{
             <div class="row">
 
                 <div class="field">
-                    <label class="field-label">First Name</label>
+                    <label class="field-label">Prenom</label>
                     <input type="text" name="first_name"
                         value="<?php echo htmlspecialchars($row['first_name']); ?>"
                         required>
                 </div>
 
                 <div class="field">
-                    <label class="field-label">Last Name</label>
+                    <label class="field-label">Nom</label>
                     <input type="text" name="last_name"
                         value="<?php echo htmlspecialchars($row['last_name']); ?>"
                         required>
@@ -272,15 +268,15 @@ select:focus{
 
             </div>
 
-            <label class="field-label">Email</label>
+            <label class="field-label">Adresse e-mail</label>
             <input type="email" name="email"
                 value="<?php echo htmlspecialchars($row['email']); ?>">
 
-            <label class="field-label">Phone</label>
+            <label class="field-label">Téléphone</label>
             <input type="text" name="phone"
                 value="<?php echo htmlspecialchars($row['phone']); ?>">
 
-            <label class="field-label">Class</label>
+            <label class="field-label">Classe</label>
 
             <select name="class_id" required>
 
@@ -298,15 +294,26 @@ select:focus{
                 ?>
 
             </select>
+            <label class="field-label">Statut</label>
+
+<select name="status" required>
+    <option value="active" <?php echo ($row['status'] == 'active') ? 'selected' : ''; ?>>
+        Actif
+    </option>
+
+    <option value="inactive" <?php echo ($row['status'] == 'inactive') ? 'selected' : ''; ?>>
+        Inactif
+    </option>
+</select>
 
             <div class="form-actions">
 
                 <a href="list.php" class="btn-back">
-                    ← Back to list
+                    ← Retour à la liste
                 </a>
 
                 <button type="submit" name="update" class="btn-primary">
-                    Update Student
+                   Mettre à jour l'étudiant
                 </button>
 
             </div>

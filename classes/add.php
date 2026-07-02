@@ -33,158 +33,144 @@ if (isset($_POST['add'])) {
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Add Class</title>
+<title>Ajouter une classe</title>
 <link rel="stylesheet" href="../assets/css/style.css">
 <style>
-    :root {
-        --bg-page: #eef1f6;
-        --surface: #ffffff;
-        --navy-900: #16213e;
-        --navy-700: #2c3e67;
-        --gold-500: #b8902a;
-        --slate-700: #334155;
-        --slate-400: #94a3b8;
-        --green-600: #15803d;
-        --green-700: #0f5c2c;
-        --green-050: #eafbf0;
-        --red-600: #c0392b;
-        --red-050: #fdecea;
-    }
-
     body {
-        background: var(--bg-page);
-    }
+    background: #eef1f6;
+}
 
-    .container {
-        max-width: 480px;
-        margin: 56px auto;
-        padding: 0 20px;
-    }
+.container {
+    max-width: 480px;
+    margin: 56px auto;
+    padding: 0 20px;
+}
 
-    .page-header {
-        margin-bottom: 28px;
-    }
+.page-header {
+    margin-bottom: 28px;
+}
 
-    .page-eyebrow {
-        display: block;
-        font-size: 12px;
-        font-weight: 700;
-        letter-spacing: 0.14em;
-        text-transform: uppercase;
-        color: var(--gold-500);
-        margin-bottom: 8px;
-    }
+.page-eyebrow {
+    display: block;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #b8902a;
+    margin-bottom: 8px;
+}
 
-    .title {
-        font-size: 28px;
-        font-weight: 800;
-        letter-spacing: -0.01em;
-        color: var(--navy-900);
-        margin: 0 0 10px;
-    }
+.title {
+    font-size: 28px;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    color: #16213e;
+    margin: 0 0 10px;
+}
 
-    .title-rule {
-        width: 56px;
-        height: 3px;
-        background: var(--gold-500);
-        border: none;
-        margin: 0 0 12px;
-    }
+.title-rule {
+    width: 56px;
+    height: 3px;
+    background: #b8902a;
+    border: none;
+    margin: 0 0 12px;
+}
 
-    .page-meta {
-        font-size: 14px;
-        color: var(--slate-400);
-    }
+.page-meta {
+    font-size: 14px;
+    color: #94a3b8;
+}
 
-    .card {
-        background: var(--surface);
-        border-radius: 12px;
-        box-shadow: 0 6px 24px rgba(22, 33, 62, 0.08);
-        padding: 28px;
-    }
+.card {
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 6px 24px rgba(22, 33, 62, 0.08);
+    padding: 28px;
+}
 
-    .message {
-        font-size: 14px;
-        padding: 10px 14px;
-        border-radius: 8px;
-        margin-bottom: 18px;
-        border: 1px solid transparent;
-    }
+.message {
+    font-size: 14px;
+    padding: 10px 14px;
+    border-radius: 8px;
+    margin-bottom: 18px;
+    border: 1px solid transparent;
+}
 
-    .message.success {
-        background: var(--green-050);
-        border-color: var(--green-600);
-        color: var(--green-700);
-    }
+.message.success {
+    background: #eafbf0;
+    border-color: #15803d;
+    color: #0f5c2c;
+}
 
-    .message.error {
-        background: var(--red-050);
-        border-color: var(--red-600);
-        color: var(--red-600);
-    }
+.message.error {
+    background: #fdecea;
+    border-color: #c0392b;
+    color: #c0392b;
+}
 
-    .field-label {
-        display: block;
-        font-size: 12px;
-        font-weight: 700;
-        letter-spacing: 0.06em;
-        text-transform: uppercase;
-        color: var(--slate-700);
-        margin-bottom: 8px;
-    }
+.field-label {
+    display: block;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #334155;
+    margin-bottom: 8px;
+}
 
-    input[type="text"] {
-        width: 100%;
-        box-sizing: border-box;
-        padding: 11px 14px;
-        font-size: 15px;
-        color: var(--navy-900);
-        border: 1.5px solid #dde2ec;
-        border-radius: 8px;
-        margin-bottom: 22px;
-        transition: border-color 0.15s ease;
-    }
+input[type="text"] {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 11px 14px;
+    font-size: 15px;
+    color: #16213e;
+    border: 1.5px solid #dde2ec;
+    border-radius: 8px;
+    margin-bottom: 22px;
+    transition: border-color 0.15s ease;
+}
 
-    input[type="text"]:focus {
-        outline: none;
-        border-color: var(--navy-700);
-    }
+input[type="text"]:focus {
+    outline: none;
+    border-color: #2c3e67;
+}
 
-    .form-actions {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 12px;
-    }
+.form-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
 
-    .btn-primary {
-        background: var(--green-600);
-        color: #ffffff;
-        border: none;
-        padding: 11px 22px;
-        font-size: 14px;
-        font-weight: 600;
-        border-radius: 8px;
-        cursor: pointer;
-        transition: background 0.15s ease;
-    }
+.btn-primary {
+    background: #15803d;
+    color: #ffffff;
+    border: none;
+    padding: 11px 22px;
+    font-size: 14px;
+    font-weight: 600;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
 
-    .btn-primary:hover {
-        background: var(--green-700);
-    }
+.btn-primary:hover {
+    background: #0f5c2c;
+}
 
-    .btn-back {
-        font-size: 14px;
-        font-weight: 600;
-        color: var(--slate-400);
-        text-decoration: none;
-    }
+.btn-back {
+    font-size: 14px;
+    font-weight: 600;
+    color: #94a3b8;
+    text-decoration: none;
+}
 
-    .btn-back:hover {
-        color: var(--navy-700);
-    }
-    .top-actions{
-    margin-bottom:20px;
+.btn-back:hover {
+    color: #2c3e67;
+}
+
+.top-actions {
+    margin-bottom: 20px;
 }
 
 </style>
@@ -194,10 +180,10 @@ if (isset($_POST['add'])) {
 <div class="container">
 
     <div class="page-header">
-        <span class="page-eyebrow">School Records</span>
-        <h1 class="title">Add Class</h1>
+        <span class="page-eyebrow">Dossiers scolaires</span>
+        <h1 class="title">Ajouter une classe</h1>
         <hr class="title-rule">
-        <div class="page-meta">Create a new class for your school records.</div>
+        <div class="page-meta">Créer une nouvelle classe pour vos dossiers scolaires.</div>
     </div>
     <div class="card">
 
@@ -209,7 +195,7 @@ if (isset($_POST['add'])) {
 
         <form method="POST">
 
-            <label class="field-label" for="name">Class Name</label>
+            <label class="field-label" for="name">Nom de la classe</label>
             <input
                 type="text"
                 id="name"
@@ -221,9 +207,9 @@ if (isset($_POST['add'])) {
             >
 
             <div class="form-actions">
-                <a href="list.php" class="btn-back">&larr; Back to list</a>
+                <a href="list.php" class="btn-back">&larr; Retour à la liste</a>
                 <button type="submit" name="add" class="btn-primary">
-                    Add Class
+                   Ajouter une classe
                 </button>
             </div>
 

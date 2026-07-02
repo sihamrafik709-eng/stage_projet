@@ -1,6 +1,6 @@
-<?php include("../includes/navbar.php"); ?>
 <?php
 session_start();
+include("../includes/navbar.php");
 include("../config/db.php");
 
 if (!isset($_SESSION['user'])) {
@@ -10,179 +10,183 @@ if (!isset($_SESSION['user'])) {
 
 $students = $conn->query("SELECT * FROM students ORDER BY first_name");
 
-$error = "";
+$message = "";
+$type = "";
 
 if (isset($_POST['save'])) {
+
     $student_id = $_POST['student_id'] ?? '';
     $date       = $_POST['date'] ?? '';
     $status     = $_POST['status'] ?? '';
 
     if ($student_id === '' || $date === '' || $status === '') {
-        $error = "Veuillez remplir tous les champs.";
+
+        $message = "Please fill in all fields.";
+        $type = "error";
+
     } else {
-        // Requête préparée — protège contre l'injection SQL
+
         $stmt = $conn->prepare("INSERT INTO attendance (student_id, date, status) VALUES (?, ?, ?)");
         $stmt->bind_param("iss", $student_id, $date, $status);
 
         if ($stmt->execute()) {
-            header("Location: list.php");
-            exit();
+
+            $message = "Attendance added successfully!";
+            $type = "success";
+
         } else {
-            $error = "Une erreur est survenue lors de l'enregistrement.";
+
+            $message = "Error while saving attendance.";
+            $type = "error";
         }
+
         $stmt->close();
     }
 }
 ?>
+
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ajouter une présence — SMS Admin</title>
+<title>Ajouter une présence</title>
 
 <style>
-    :root{
-        --navy:#0f1b3c;
-        --navy-light:#16213e;
-        --navy-lighter:#1f2a4a;
-        --gold:#c9a44c;
-        --gold-light:#e3c878;
-        --forest:#2e7d4f;
-        --danger:#c0392b;
-        --bg:#f4f5f7;
-        --card-border:#e6e2d6;
-        --text-dark:#1c1f2a;
-        --text-muted:#6b7280;
-    }
 
-    *{box-sizing:border-box;}
+:body{
+    background:#eef1f6;
+    font-family:'Segoe UI',sans-serif;
+    margin:0;
+}
 
-    body{
-        margin:0;
-        font-family:'Segoe UI', Arial, sans-serif;
-        background:var(--bg);
-        min-height:100vh;
-        display:flex;
-        align-items:center;
-        justify-content:center;
-        padding:20px;
-    }
+.container{
+    max-width:520px;
+    margin:56px auto;
+    padding:0 20px;
+}
 
-    .container{
-        width:100%;
-        max-width:420px;
-        background:#fff;
-        padding:32px 30px;
-        border-radius:14px;
-        border:1px solid var(--card-border);
-        box-shadow:0 4px 18px rgba(15,27,60,0.08);
-        position:relative;
-        overflow:hidden;
-    }
+.page-header{
+    margin-bottom:28px;
+}
 
-    .container::before{
-        content:"";
-        position:absolute;
-        top:0; left:0; right:0;
-        height:5px;
-        background:linear-gradient(90deg, var(--navy), var(--gold));
-    }
+.page-eyebrow{
+    display:block;
+    font-size:12px;
+    font-weight:700;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:#b8902a;
+    margin-bottom:8px;
+}
 
-    .header-icon{
-        width:54px;
-        height:54px;
-        border-radius:12px;
-        background:#fdf1e7;
-        color:#c9821f;
-        display:flex;
-        align-items:center;
-        justify-content:center;
-        font-size:26px;
-        margin:6px auto 16px auto;
-    }
+.title{
+    font-size:28px;
+    font-weight:800;
+    color:#16213e;
+    margin:0 0 10px;
+}
 
-    h2{
-        text-align:center;
-        color:var(--navy);
-        margin:0 0 4px 0;
-        font-size:21px;
-    }
+.title-rule{
+    width:56px;
+    height:3px;
+    background:#b8902a;
+    border:none;
+    margin:0 0 12px;
+}
 
-    .subtitle{
-        text-align:center;
-        color:var(--text-muted);
-        font-size:13.5px;
-        margin-bottom:24px;
-    }
+.page-meta{
+    font-size:14px;
+    color:#94a3b8;
+}
 
-    label{
-        display:block;
-        font-size:13px;
-        font-weight:600;
-        color:var(--navy);
-        margin-bottom:6px;
-        margin-top:16px;
-    }
+.card{
+    background:#ffffff;
+    border-radius:12px;
+    box-shadow:0 6px 24px rgba(22,33,62,.08);
+    padding:28px;
+}
 
-    input, select{
-        width:100%;
-        padding:11px 12px;
-        border:1px solid var(--card-border);
-        border-radius:8px;
-        font-size:14px;
-        font-family:inherit;
-        background:#fafafa;
-        transition:border-color .2s ease;
-    }
+.message{
+    font-size:14px;
+    padding:10px 14px;
+    border-radius:8px;
+    margin-bottom:18px;
+    border:1px solid transparent;
+}
 
-    input:focus, select:focus{
-        outline:none;
-        border-color:var(--gold);
-        background:#fff;
-    }
+.message.success{
+    background:#eafbf0;
+    border-color:#15803d;
+    color:#0f5c2c;
+}
 
-    button{
-        width:100%;
-        padding:12px;
-        margin-top:24px;
-        background:var(--navy-light);
-        color:#fff;
-        border:none;
-        border-radius:8px;
-        font-size:14.5px;
-        font-weight:700;
-        letter-spacing:0.3px;
-        cursor:pointer;
-        transition:background .2s ease;
-    }
+.message.error{
+    background:#fdecea;
+    border-color:#c0392b;
+    color:#c0392b;
+}
 
-    button:hover{
-        background:var(--navy);
-    }
+.field-label{
+    display:block;
+    font-size:12px;
+    font-weight:700;
+    letter-spacing:.06em;
+    text-transform:uppercase;
+    color:#334155;
+    margin-bottom:8px;
+}
 
-    .error-box{
-        background:#fdecea;
-        color:var(--danger);
-        border:1px solid #f5c6c0;
-        padding:10px 14px;
-        border-radius:8px;
-        font-size:13.5px;
-        margin-bottom:10px;
-    }
+input,
+select{
+    width:100%;
+    box-sizing:border-box;
+    padding:11px 14px;
+    font-size:15px;
+    border:1.5px solid #dde2ec;
+    border-radius:8px;
+    margin-bottom:22px;
+    background:#fff;
+}
 
-    .back-link{
-        display:block;
-        text-align:center;
-        margin-top:18px;
-        font-size:13px;
-        color:var(--text-muted);
-        text-decoration:none;
-    }
+input:focus,
+select:focus{
+    outline:none;
+    border-color:#2c3e67;
+}
 
-    .back-link:hover{
-        color:var(--navy);
-    }
+.form-actions{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:12px;
+}
+
+.btn-primary{
+    background:#15803d;
+    color:#fff;
+    border:none;
+    padding:11px 22px;
+    font-size:14px;
+    font-weight:600;
+    border-radius:8px;
+    cursor:pointer;
+}
+
+.btn-primary:hover{
+    background:#0f5c2c;
+}
+
+.btn-back{
+    color:#94a3b8;
+    text-decoration:none;
+    font-size:14px;
+    font-weight:600;
+}
+
+.btn-back:hover{
+    color:#2c3e67;
+}
 </style>
 </head>
 
@@ -190,42 +194,96 @@ if (isset($_POST['save'])) {
 
 <div class="container">
 
-    <div class="header-icon">✅</div>
-    <h2>Ajouter une présence</h2>
-    <p class="subtitle">Enregistrer le statut de présence d'un étudiant</p>
+    <div class="page-header">
+        <span class="page-eyebrow">Gestion des présences</span>
+        <h1 class="title">Ajouter une présence</h1>
+        <hr class="title-rule">
+        <div class="page-meta">
+           Enregistrer la présence des étudiants rapidement et en toute sécurité.
+        </div>
+    </div>
 
-    <?php if ($error): ?>
-        <div class="error-box"><?php echo htmlspecialchars($error); ?></div>
-    <?php endif; ?>
+    <div class="card">
 
-    <form method="POST">
+        <?php if (!empty($message)) { ?>
+            <div class="message <?php echo htmlspecialchars($type); ?>" id="msg">
+                <?php echo htmlspecialchars($message); ?>
+            </div>
+        <?php } ?>
 
-        <label for="student_id">Étudiant</label>
-        <select id="student_id" name="student_id" required>
-            <option value="">Sélectionner un étudiant</option>
-            <?php while ($row = $students->fetch_assoc()): ?>
-                <option value="<?php echo (int)$row['id']; ?>">
-                    <?php echo htmlspecialchars($row['first_name'] . " " . $row['last_name']); ?>
-                </option>
-            <?php endwhile; ?>
-        </select>
+        <form method="POST">
 
-        <label for="date">Date</label>
-        <input type="date" id="date" name="date" required>
+            <label class="field-label" for="student_id">
+                Étudiant
+            </label>
 
-        <label for="status">Statut</label>
-        <select id="status" name="status" required>
-            <option value="present">Présent</option>
-            <option value="absent">Absent</option>
-        </select>
+            <select id="student_id" name="student_id" required>
+                <option value="">Select Student</option>
 
-        <button type="submit" name="save">Enregistrer</button>
+                <?php while($row = $students->fetch_assoc()) { ?>
 
-    </form>
+                    <option value="<?php echo (int)$row['id']; ?>">
+                        <?php echo htmlspecialchars($row['first_name'].' '.$row['last_name']); ?>
+                    </option>
 
-    <a href="list.php" class="back-link">← Retour à la liste des présences</a>
+                <?php } ?>
+            </select>
+
+            <label class="field-label" for="date">
+                Date
+            </label>
+
+            <input
+                type="date"
+                id="date"
+                name="date"
+                required
+            >
+
+            <label class="field-label" for="status">
+                Statut
+            </label>
+
+            <select id="status" name="status" required>
+                <option value="present">Present</option>
+                <option value="absent">Absent</option>
+            </select>
+
+            <div class="form-actions">
+
+                <a href="list.php" class="btn-back">
+                    &larr; Retour à la liste
+                </a>
+
+                <button type="submit" name="save" class="btn-primary">
+                    Enregistrer la présence
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
 
 </div>
+
+<script>
+setTimeout(function(){
+
+    let msg = document.getElementById("msg");
+
+    if(msg){
+
+        msg.style.transition = "opacity 0.5s ease";
+        msg.style.opacity = "0";
+
+        setTimeout(() => {
+            msg.remove();
+        }, 500);
+    }
+
+}, 3000);
+</script>
 
 </body>
 </html>

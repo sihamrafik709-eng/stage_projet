@@ -1,6 +1,6 @@
-<?php include("../includes/navbar.php"); ?>
-<?php
+<?php 
 session_start();
+include("../includes/navbar.php");
 include("../config/db.php");
 
 if (!isset($_SESSION['user'])) {
@@ -40,187 +40,223 @@ if (isset($_POST['save'])) {
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Add Grade — SMS Admin</title>
-
+<title>Ajouter une note — SMS Admin</title>
+<link rel="stylesheet" href="../assets/css/style.css">
 <style>
-    *{box-sizing:border-box;}
+    body {
+    background: #eef1f6;
+    font-family: 'Segoe UI', sans-serif;
+    margin: 0;
+}
 
-    body{
-        margin:0;
-        font-family:'Segoe UI', Arial, sans-serif;
-        background:#f4f5f7;
-        min-height:100vh;
-        display:flex;
-        align-items:center;
-        justify-content:center;
-        padding:20px;
-    }
+.container {
+    max-width: 520px;
+    margin: 56px auto;
+    padding: 0 20px;
+}
 
-    .container{
-        width:100%;
-        max-width:420px;
-        background:#fff;
-        padding:32px 30px;
-        border-radius:14px;
-        border:1px solid #e6e2d6;
-        box-shadow:0 4px 18px rgba(15,27,60,0.08);
-        position:relative;
-        overflow:hidden;
-    }
+.page-header {
+    margin-bottom: 28px;
+}
 
-    .container::before{
-        content:"";
-        position:absolute;
-        top:0;
-        left:0;
-        right:0;
-        height:5px;
-        background:linear-gradient(90deg, #0f1b3c, #c9a44c);
-    }
+.page-eyebrow {
+    display: block;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #b8902a;
+    margin-bottom: 8px;
+}
 
-    .header-icon{
-        width:54px;
-        height:54px;
-        border-radius:12px;
-        background:#f1edfb;
-        color:#6d4fc7;
-        display:flex;
-        align-items:center;
-        justify-content:center;
-        font-size:26px;
-        margin:6px auto 16px auto;
-    }
+.title {
+    font-size: 28px;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    color: #16213e;
+    margin: 0 0 10px;
+}
 
-    h2{
-        text-align:center;
-        color:#0f1b3c;
-        margin:0 0 4px 0;
-        font-size:21px;
-    }
+.title-rule {
+    width: 56px;
+    height: 3px;
+    background: #b8902a;
+    border: none;
+    margin: 0 0 12px;
+}
 
-    .subtitle{
-        text-align:center;
-        color:#6b7280;
-        font-size:13.5px;
-        margin-bottom:24px;
-    }
+.page-meta {
+    font-size: 14px;
+    color: #94a3b8;
+}
 
-    label{
-        display:block;
-        font-size:13px;
-        font-weight:600;
-        color:#0f1b3c;
-        margin-bottom:6px;
-        margin-top:16px;
-    }
+.card {
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 6px 24px rgba(22, 33, 62, 0.08);
+    padding: 28px;
+}
 
-    input,
-    select{
-        width:100%;
-        padding:11px 12px;
-        border:1px solid #e6e2d6;
-        border-radius:8px;
-        font-size:14px;
-        font-family:inherit;
-        background:#fafafa;
-        transition:border-color .2s ease;
-    }
+.message {
+    font-size: 14px;
+    padding: 10px 14px;
+    border-radius: 8px;
+    margin-bottom: 18px;
+    border: 1px solid transparent;
+}
 
-    input:focus,
-    select:focus{
-        outline:none;
-        border-color:#c9a44c;
-        background:#fff;
-    }
+.message.error {
+    background: #fdecea;
+    border-color: #c0392b;
+    color: #c0392b;
+}
 
-    button{
-        width:100%;
-        padding:12px;
-        margin-top:24px;
-        background:#16213e;
-        color:#fff;
-        border:none;
-        border-radius:8px;
-        font-size:14.5px;
-        font-weight:700;
-        letter-spacing:0.3px;
-        cursor:pointer;
-        transition:background .2s ease;
-    }
+.message.success {
+    background: #eafbf0;
+    border-color: #15803d;
+    color: #0f5c2c;
+}
 
-    button:hover{
-        background:#0f1b3c;
-    }
+.field-label {
+    display: block;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #334155;
+    margin-bottom: 8px;
+}
 
-    .error-box{
-        background:#fdecea;
-        color:#c0392b;
-        border:1px solid #f5c6c0;
-        padding:10px 14px;
-        border-radius:8px;
-        font-size:13.5px;
-        margin-bottom:10px;
-    }
+input[type="number"],
+select {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 11px 14px;
+    font-size: 15px;
+    color: #16213e;
+    border: 1.5px solid #dde2ec;
+    border-radius: 8px;
+    margin-bottom: 22px;
+    background: #fff;
+    transition: border-color 0.15s ease;
+    appearance: auto;
+}
 
-    .back-link{
-        display:block;
-        text-align:center;
-        margin-top:18px;
-        font-size:13px;
-        color:#6b7280;
-        text-decoration:none;
-    }
+input[type="number"]:focus,
+select:focus {
+    outline: none;
+    border-color: #2c3e67;
+}
 
-    .back-link:hover{
-        color:#0f1b3c;
-    }
+.form-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.btn-primary {
+    background: #15803d;
+    color: #ffffff;
+    border: none;
+    padding: 11px 22px;
+    font-size: 14px;
+    font-weight: 600;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+
+.btn-primary:hover {
+    background: #0f5c2c;
+}
+
+.btn-back {
+    font-size: 14px;
+    font-weight: 600;
+    color: #94a3b8;
+    text-decoration: none;
+}
+
+.btn-back:hover {
+    color: #2c3e67;
+}
 </style>
 </head>
-
 <body>
 
 <div class="container">
 
-    <div class="header-icon">📈</div>
-    <h2>Add Grade </h2>
-    <p class="subtitle">Record a student's grade in a subject </p>
+    <div class="page-header">
+        <span class="page-eyebrow">Dossiers scolaires</span>
+        <h1 class="title">Ajouter une note</h1>
+        <hr class="title-rule">
+        <div class="page-meta">Enregistrer la note d'un étudiant dans une matière.</div>
+    </div>
 
-    <?php if ($error): ?>
-        <div class="error-box"><?php echo htmlspecialchars($error); ?></div>
-    <?php endif; ?>
+    <div class="card">
 
-    <form method="POST">
+        <?php if (!empty($error)) { ?>
+            <div class="message error" id="msg">
+                <?php echo htmlspecialchars($error); ?>
+            </div>
+        <?php } ?>
 
-        <label for="student_id">Student</label>
-        <select id="student_id" name="student_id" required>
-            <option value="">Select a Student </option>
-            <?php while ($row = $students->fetch_assoc()): ?>
-                <option value="<?php echo (int)$row['id']; ?>">
-                    <?php echo htmlspecialchars($row['first_name'] . " " . $row['last_name']); ?>
-                </option>
-            <?php endwhile; ?>
-        </select>
+        <form method="POST">
 
-        <label for="subject">Subject </label>
-        <select id="subject" name="subject" required>
-            <option value="">Select a Student</option>
-            <option value="Math">Mathematics</option>
-            <option value="Francais">French </option>
-            <option value="Histoire">History</option>
-            <option value="Sciences">Science</option>
-            <option value="Anglais">English</option>
-        </select>
+            <label class="field-label" for="student_id">Étudiant</label>
+            <select id="student_id" name="student_id" required>
+                <option value="">Sélectionnez un étudiant</option>
+                <?php while ($row = $students->fetch_assoc()): ?>
+                    <option value="<?php echo (int)$row['id']; ?>">
+                        <?php echo htmlspecialchars($row['first_name'] . ' ' . $row['last_name']); ?>
+                    </option>
+                <?php endwhile; ?>
+            </select>
 
-        <label for="score">Grade (out of 20)</label>
-        <input type="number" id="score" name="score" min="0" max="20" step="0.25" required>
+            <label class="field-label" for="subject">Matière</label>
+            <select id="subject" name="subject" required>
+                <option value="">Sélectionnez une matière</option>
+                <option value="Math">Mathématiques</option>
+                <option value="Francais">Français</option>
+                <option value="Histoire">Histoire</option>
+                <option value="Sciences">Sciences</option>
+                <option value="Anglais">Anglais</option>
+            </select>
 
-        <button type="submit" name="save">Save</button>
+            <label class="field-label" for="score">Note (sur 20)</label>
+            <input
+                type="number"
+                id="score"
+                name="score"
+                min="0"
+                max="20"
+                step="0.25"
+                placeholder="Ex : 14.5"
+                required
+            >
 
-    </form>
+            <div class="form-actions">
+                <a href="list.php" class="btn-back">&larr; Retour à la liste</a>
+                <button type="submit" name="save" class="btn-primary">Enregistrer la note</button>
+            </div>
 
-    <a href="list.php" class="back-link">← Back to Grades List</a>
+        </form>
+
+    </div>
 
 </div>
+
+<script>
+setTimeout(function () {
+    let msg = document.getElementById("msg");
+    if (msg) {
+        msg.style.transition = "opacity 0.5s ease";
+        msg.style.opacity = "0";
+        setTimeout(() => msg.remove(), 500);
+    }
+}, 3000);
+</script>
 
 </body>
 </html>

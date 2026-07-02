@@ -1,7 +1,13 @@
-<?php include("../includes/navbar.php"); ?>
+<?php 
+session_start();
+include("../includes/navbar.php"); ?>
 <?php
-include("../config/db.php");
 
+if($_SESSION['role'] != 'admin'){
+    header("Location: ../dashboard/index.php");
+    exit();
+}
+include("../config/db.php");
 $result = $conn->query("SELECT * FROM teachers ORDER BY id DESC");
 ?>
 
@@ -10,35 +16,23 @@ $result = $conn->query("SELECT * FROM teachers ORDER BY id DESC");
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Teachers List</title>
+<title>Liste des enseignants</title>
 
 <style>
-:root{
-    --bg-page:#eef1f6;
-    --surface:#ffffff;
-    --navy-900:#16213e;
-    --navy-700:#2c3e67;
-    --gold-500:#b8902a;
-    --slate-400:#94a3b8;
-    --green-600:#15803d;
-    --green-700:#0f5c2c;
-    --red-600:#c0392b;
-}
-
 *{
     box-sizing:border-box;
     font-family:Arial,sans-serif;
 }
 
 body{
-    background:var(--bg-page);
+    background:#eef1f6;
     margin:0;
 }
 
 .container{
     max-width:1200px;
     margin:50px auto;
-    padding:0 20px;
+    padding:0 150px;
 }
 
 .page-header{
@@ -51,27 +45,27 @@ body{
     font-weight:700;
     letter-spacing:.12em;
     text-transform:uppercase;
-    color:var(--gold-500);
+    color:#b8902a;
     margin-bottom:8px;
 }
 
 .title{
     font-size:30px;
     font-weight:800;
-    color:var(--navy-900);
+    color:#16213e;
     margin:0;
 }
 
 .title-rule{
     width:60px;
     height:3px;
-    background:var(--gold-500);
+    background:#b8902a;
     border:none;
     margin:12px 0;
 }
 
 .page-meta{
-    color:var(--slate-400);
+    color:#94a3b8;
 }
 
 .top-actions{
@@ -79,7 +73,7 @@ body{
 }
 
 .btn-add{
-    background:var(--green-600);
+    background:#15803d;
     color:white;
     text-decoration:none;
     padding:12px 18px;
@@ -88,11 +82,11 @@ body{
 }
 
 .btn-add:hover{
-    background:var(--green-700);
+    background:#0f5c2c;
 }
 
 .card{
-    background:var(--surface);
+    background:#ffffff;
     border-radius:12px;
     box-shadow:0 6px 24px rgba(22,33,62,.08);
     overflow:hidden;
@@ -108,7 +102,7 @@ table{
 }
 
 thead{
-    background:var(--navy-900);
+    background:#16213e;
     color:white;
 }
 
@@ -128,7 +122,7 @@ td{
 }
 
 .btn-edit{
-    background:var(--green-600);
+    background:#15803d;
     color:white;
     text-decoration:none;
     padding:8px 12px;
@@ -137,11 +131,11 @@ td{
 }
 
 .btn-edit:hover{
-    background:var(--green-700);
+    background:#0f5c2c;
 }
 
 .btn-delete{
-    background:var(--red-600);
+    background:#c0392b;
     color:white;
     text-decoration:none;
     padding:8px 12px;
@@ -156,7 +150,7 @@ td{
 .empty{
     text-align:center;
     padding:20px;
-    color:var(--slate-400);
+    color:#94a3b8;
 }
 </style>
 
@@ -166,16 +160,16 @@ td{
 <div class="container">
 
     <div class="page-header">
-        <span class="page-eyebrow">School Records</span>
-        <h1 class="title">Teachers List</h1>
+        <span class="page-eyebrow">Dossiers scolaires</span>
+        <h1 class="title">Liste des enseignants</h1>
         <hr class="title-rule">
         <div class="page-meta">
-            Manage all teacher records.
+            Gérer tous les dossiers des enseignants
         </div>
     </div>
 
     <div class="top-actions">
-        <a href="add.php" class="btn-add">+ Add Teacher</a>
+        <a href="add.php" class="btn-add">+ Ajouter un enseignant</a>
     </div>
 
     <div class="card">
@@ -187,8 +181,8 @@ td{
                 <thead>
                     <tr>
                         <th>ID</th>
-                        <th>Name</th>
-                        <th>Subject</th>
+                        <th>Nom</th>
+                        <th>Matière</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -214,14 +208,14 @@ td{
                                     <a
                                         href="edit.php?id=<?= $row['id'] ?>"
                                         class="btn-edit">
-                                        Edit
+                                        Modifier
                                     </a>
 
                                     <a
                                                  href="delete.php?id=<?= $row['id'] ?>"
                                         class="btn-delete"
                                         onclick="return confirm('Are you sure you want to delete this teacher?')">
-                                        Delete
+                                        Supprimer
                                     </a>
 
                                 </div>
@@ -236,7 +230,7 @@ td{
 
                     <tr>
                         <td colspan="4" class="empty">
-                            No teachers found.
+                           Aucun enseignant trouvé
                         </td>
                     </tr>
 

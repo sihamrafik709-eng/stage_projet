@@ -1,6 +1,11 @@
-<?php include("../includes/navbar.php"); ?>
 <?php
 session_start();
+include("../includes/navbar.php"); ?>
+<?php
+if(!isset($_SESSION['user'])){
+    header("Location: ../auth/login.php");
+    exit();
+}
 include("../config/db.php");
 
 if (!isset($_SESSION['user'])) {
@@ -30,166 +35,152 @@ $result = $conn->query($sql);
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>List of Grades — SMS Admin</title>
+<title>Liste des notes — SMS Admin</title>
 <style>
+body{
+    margin:0;
+    font-family:'Segoe UI',sans-serif;
+    background:#eef1f6;
+}
 
-    *{box-sizing:border-box;}
+.container{
+    max-width:960px;
+    margin:56px auto;
+    padding:0 20px;
+}
 
-    body{
-        margin:0;
-        font-family:'Segoe UI', Arial, sans-serif;
-        background:#f4f5f7;
-        color:#1c1f2a;
-    }
+.page-header{
+    margin-bottom:25px;
+}
 
-    .container{
-        width:90%;
-        max-width:1100px;
-        margin:36px auto;
-    }
+.page-eyebrow{
+    display:block;
+    font-size:12px;
+    font-weight:700;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:#b8902a;
+    margin-bottom:8px;
+}
 
-    .top-bar{
-        display:flex;
-        justify-content:space-between;
-        align-items:center;
-        flex-wrap:wrap;
-        gap:12px;
-        margin-bottom:20px;
-    }
+.title{
+    font-size:28px;
+    font-weight:800;
+    color:#16213e;
+    margin:0 0 10px;
+}
 
-    h2{
-        color:#0f1b3c;
-        margin:0;
-        font-size:22px;
-    }
+.title-rule{
+    width:56px;
+    height:3px;
+    background:#b8902a;
+    border:none;
+    margin:0 0 12px;
+}
 
-    .add-btn{
-        background:#16213e;
-        color:#fff;
-        text-decoration:none;
-        padding:10px 18px;
-        border-radius:8px;
-        font-size:13.5px;
-        font-weight:700;
-        transition:background .2s ease;
-    }
+.page-meta{
+    font-size:14px;
+    color:#94a3b8;
+}
 
-    .add-btn:hover{
-        background:#0f1b3c;
-    }
+.top-bar{
+    display:flex;
+    justify-content:flex-end;
+    margin-bottom:20px;
+}
 
-    .search-box{
-        position:relative;
-        margin-bottom:16px;
-    }
+.add-btn{
+    background:#15803d;
+    color:white;
+    text-decoration:none;
+    padding:11px 20px;
+    border-radius:8px;
+    font-weight:600;
+}
 
-    .search-box input{
-        width:100%;
-        max-width:320px;
-        padding:11px 14px 11px 38px;
-        border:1px solid #e6e2d6;
-        border-radius:8px;
-        font-size:14px;
-        background:#fff url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="%236b7280" viewBox="0 0 16 16"><path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/></svg>') no-repeat 12px center;
-        background-size:14px;
-    }
+.add-btn:hover{
+    background:#0f5c2c;
+}
 
-    .search-box input:focus{
-        outline:none;
-        border-color:#c9a44c;
-    }
+.search-box{
+    margin-bottom:20px;
+}
 
-    .panel{
-        background:#fff;
-        border-radius:12px;
-        border:1px solid #e6e2d6;
-        box-shadow:0 2px 6px rgba(15,27,60,0.05);
-        overflow:hidden;
-    }
+.search-box input{
+    width:320px;
+    padding:11px 14px;
+    border:1px solid #dde2ec;
+    border-radius:8px;
+}
 
-    table{
-        width:100%;
-        border-collapse:collapse;
-    }
+.panel{
+    background:white;
+    border-radius:12px;
+    box-shadow:0 6px 24px rgba(22,33,62,.08);
+    overflow:hidden;
+}
 
-    th{
-        background:#16213e;
-        color:#fff;
-        padding:13px 14px;
-        text-align:left;
-        font-size:13px;
-        text-transform:uppercase;
-        letter-spacing:0.4px;
-    }
+table{
+    width:100%;
+    border-collapse:collapse;
+}
 
-    td{
-        padding:13px 14px;
-        border-bottom:1px solid #f0f0f0;
-        font-size:14.5px;
-    }
+th{
+    background:#16213e;
+    color:white;
+    padding:14px;
+    text-align:left;
+}
 
-    tbody tr:hover td{
-        background:#faf9f5;
-    }
+td{
+    padding:14px;
+    border-bottom:1px solid #eee;
+}
 
-    .badge{
-        display:inline-block;
-        padding:4px 12px;
-        border-radius:20px;
-        font-size:12.5px;
-        font-weight:700;
-    }
+.btn-edit{
+    background:#15803d;
+    color:white;
+    padding:7px 12px;
+    border-radius:6px;
+    text-decoration:none;
+}
 
-    .badge.good{
-        background:#e6f4ea;
-        color:#2e7d4f;
-    }
+.btn-delete{
+    background:#c0392b;
+    color:white;
+    padding:7px 12px;
+    border-radius:6px;
+    border:none;
+    cursor:pointer;
+}
 
-    .badge.average{
-        background:#fdf1e7;
-        color:#c9821f;
-    }
+.actions{
+    display:flex;
+    gap:8px;
+}
 
-    .badge.low{
-        background:#fdecea;
-        color:#c0392b;
-    }
+.badge{
+    display:inline-block;
+    padding:4px 10px;
+    border-radius:20px;
+    font-size:12px;
+    font-weight:700;
+}
 
-    .empty-row td{
-        text-align:center;
-        color:#6b7280;
-        padding:24px;
-    }
+.badge.good{
+    background:#eafbf0;
+    color:#15803d;
+}
 
-    .actions{
-        display:flex;
-        gap:8px;
-    }
+.badge.average{
+    background:#fff4db;
+    color:#b8902a;
+}
 
-    .btn-action{
-        display:inline-flex;
-        align-items:center;
-        gap:5px;
-        padding:7px 12px;
-        border-radius:7px;
-        font-size:12.5px;
-        font-weight:700;
-        text-decoration:none;
-        border:none;
-        cursor:pointer;
-        font-family:inherit;
-    }
-
-    .btn-edit{
-        background:green;
-        color:white;
-    }
-
-    .btn-delete{
-        background:red;
-        color:white;
-    }
-
+.badge.low{
+    background:#fdecea;
+    color:#c0392b;
+}
 </style>
 
 </head>
@@ -198,10 +189,18 @@ $result = $conn->query($sql);
 
 <div class="container">
 
-    <div class="top-bar">
-        <h2>List of Grades</h2>
-        <a href="add.php" class="add-btn">+ Add Grade</a>
+    <div class="page-header">
+    <span class="page-eyebrow">Gestion des notes</span>
+    <h1 class="title">Liste des notes</h1>
+    <hr class="title-rule">
+    <div class="page-meta">
+        Gérer et suivre les notes des étudiants
     </div>
+</div>
+
+<div class="top-bar">
+    <a href="add.php" class="add-btn">+ Ajouter une note</a>
+</div>
 
     <div class="search-box">
         <input type="text" id="search" placeholder="Rechercher un étudiant ou une matière...">
@@ -211,26 +210,26 @@ $result = $conn->query($sql);
         <table id="table">
             <thead>
             <tr>
-                <th>Student</th>
-                <th>Subject</th>
-                <th>Grade</th>
+                <th>Étudiant</th>
+                <th>Matière</th>
+                <th>Note</th>
                 <th>Action</th>
             </tr>
             </thead>
             <tbody>
             <?php if ($result->num_rows === 0): ?>
                 <tr class="empty-row">
-                    <td colspan="4">No Grades have been recorded yet.</td>
+                    <td colspan="4">Aucune note n'a encore été enregistrée.</td>
                 </tr>
             <?php else: ?>
                 <?php while ($row = $result->fetch_assoc()):
                     $score = (float) $row['score'];
                     if ($score >= 14) {
-                        $badgeClass = 'Bon';
+                        $badgeClass = 'Good';
                     } elseif ($score >= 10) {
-                        $badgeClass = 'Moyen';
+                        $badgeClass = 'Average';
                     } else {
-                        $badgeClass = 'Faible';
+                        $badgeClass = 'Low';
                     }
                 ?>
                 <tr>
@@ -243,9 +242,9 @@ $result = $conn->query($sql);
                     </td>
                     <td>
                         <div class="actions">
-                            <a class="btn-action btn-edit" href="edit.php?id=<?php echo (int)$row['id']; ?>"> Edit</a>
+                            <a class="btn-action btn-edit" href="edit.php?id=<?php echo (int)$row['id']; ?>"> Modifier</a>
                             <button type="button" class="btn-action btn-delete"
-                                onclick="confirmDelete(<?php echo (int)$row['id']; ?>)">Delete </button>
+                                onclick="confirmDelete(<?php echo (int)$row['id']; ?>)">Supprimer </button>
                         </div>
                     </td>
                 </tr>

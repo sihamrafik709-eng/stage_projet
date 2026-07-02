@@ -51,23 +51,9 @@ if (isset($_POST['add'])) {
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Add Teacher</title>
+<title>Ajouter un étudiant</title>
 
 <style>
-:root{
-    --bg-page:#eef1f6;
-    --surface:#ffffff;
-    --navy-900:#16213e;
-    --gold-500:#b8902a;
-    --slate-700:#334155;
-    --slate-400:#94a3b8;
-    --green-600:#15803d;
-    --green-700:#0f5c2c;
-    --green-050:#eafbf0;
-    --red-600:#c0392b;
-    --red-050:#fdecea;
-}
-
 *{
     box-sizing:border-box;
     font-family:Arial,sans-serif;
@@ -75,7 +61,7 @@ if (isset($_POST['add'])) {
 
 body{
     margin:0;
-    background:var(--bg-page);
+    background:#eef1f6;
 }
 
 .container{
@@ -94,31 +80,31 @@ body{
     font-weight:700;
     letter-spacing:.12em;
     text-transform:uppercase;
-    color:var(--gold-500);
+    color:#b8902a;
     margin-bottom:8px;
 }
 
 .title{
     font-size:30px;
     font-weight:800;
-    color:var(--navy-900);
+    color:#16213e;
     margin:0;
 }
 
 .title-rule{
     width:60px;
     height:3px;
-    background:var(--gold-500);
+    background:#b8902a;
     border:none;
     margin:12px 0;
 }
 
 .page-meta{
-    color:var(--slate-400);
+    color:#94a3b8;
 }
 
 .card{
-    background:var(--surface);
+    background:#ffffff;
     padding:30px;
     border-radius:12px;
     box-shadow:0 6px 24px rgba(22,33,62,.08);
@@ -131,15 +117,15 @@ body{
 }
 
 .success{
-    background:var(--green-050);
-    color:var(--green-700);
-    border:1px solid var(--green-600);
+    background:#eafbf0;
+    color:#0f5c2c;
+    border:1px solid #15803d;
 }
 
 .error{
-    background:var(--red-050);
-    color:var(--red-600);
-    border:1px solid var(--red-600);
+    background:#fdecea;
+    color:#c0392b;
+    border:1px solid #c0392b;
 }
 
 .field-label{
@@ -147,7 +133,7 @@ body{
     font-size:12px;
     font-weight:700;
     text-transform:uppercase;
-    color:var(--slate-700);
+    color:#334155;
     margin-bottom:8px;
 }
 
@@ -161,7 +147,7 @@ input{
 
 input:focus{
     outline:none;
-    border-color:var(--navy-900);
+    border-color:#16213e;
 }
 
 .form-actions{
@@ -172,16 +158,16 @@ input:focus{
 
 .btn-back{
     text-decoration:none;
-    color:var(--slate-400);
+    color:#94a3b8;
     font-weight:600;
 }
 
 .btn-back:hover{
-    color:var(--navy-900);
+    color:#16213e;
 }
 
 .btn-primary{
-    background:var(--green-600);
+    background:#15803d;
     color:white;
     border:none;
     padding:12px 24px;
@@ -191,7 +177,7 @@ input:focus{
 }
 
 .btn-primary:hover{
-    background:var(--green-700);
+    background:#0f5c2c;
 }
 </style>
 </head>
@@ -200,11 +186,11 @@ input:focus{
 <div class="container">
 
     <div class="page-header">
-        <span class="page-eyebrow">School Records</span>
-        <h1 class="title">Add Teacher</h1>
+        <span class="page-eyebrow">Dossiers scolaires</span>
+        <h1 class="title"> Ajouter un enseignant</h1>
         <hr class="title-rule">
         <div class="page-meta">
-            Create a new teacher record.
+            Créer un nouveau dossier enseignant
         </div>
     </div>
 
@@ -218,7 +204,7 @@ input:focus{
 
         <form method="POST">
 
-            <label class="field-label">Teacher Name</label>
+            <label class="field-label">Nom de l'enseignant</label>
             <input
                 type="text"
                 name="name"
@@ -226,7 +212,7 @@ input:focus{
                 required
             >
 
-            <label class="field-label">Subject</label>
+            <label class="field-label">Matière</label>
             <input
                 type="text"
                 name="subject"
@@ -237,11 +223,11 @@ input:focus{
             <div class="form-actions">
 
                 <a href="list.php" class="btn-back">
-                    ← Back to list
+                    ← Retour à la liste
                 </a>
 
                 <button type="submit" name="add" class="btn-primary">
-                    Add Teacher
+                    Ajouter un enseignant
                 </button>
 
             </div>

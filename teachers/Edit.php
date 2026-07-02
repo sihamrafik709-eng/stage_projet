@@ -61,24 +61,17 @@ if(isset($_POST['update'])){
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Edit Teacher</title>
+<title>Modifier un enseignant</title>
 
 <style>
-:root{
-    --bg-page:#eef1f6;
-    --surface:#ffffff;
-    --navy-900:#16213e;
-    --gold-500:#b8902a;
-    --green-600:#15803d;
-    --red-600:#c0392b;
-    --slate-400:#94a3b8;
+*{
+    box-sizing:border-box;
+    font-family:Arial;
 }
-
-*{box-sizing:border-box;font-family:Arial;}
 
 body{
     margin:0;
-    background:var(--bg-page);
+    background:#eef1f6;
 }
 
 .container{
@@ -88,7 +81,7 @@ body{
 }
 
 .card{
-    background:#fff;
+    background:#ffffff;
     padding:30px;
     border-radius:12px;
     box-shadow:0 6px 24px rgba(0,0,0,.08);
@@ -97,7 +90,7 @@ body{
 .title{
     font-size:28px;
     font-weight:800;
-    color:var(--navy-900);
+    color:#16213e;
 }
 
 input{
@@ -109,16 +102,18 @@ input{
 }
 
 .btn{
-    background:var(--green-600);
+    background:#15803d;
     color:#fff;
     padding:12px 24px;
-    margin-left: 300px;
+    margin-left:300px;
     border:none;
     border-radius:8px;
     cursor:pointer;
 }
 
-.btn:hover{background:var(--navy-900);}
+.btn:hover{
+    background:#16213e;
+}
 
 .message{
     padding:10px;
@@ -126,8 +121,15 @@ input{
     border-radius:8px;
 }
 
-.success{background:#eafbf0;color:var(--green-600);}
-.error{background:#fdecea;color:var(--red-600);}
+.success{
+    background:#eafbf0;
+    color:#15803d;
+}
+
+.error{
+    background:#fdecea;
+    color:#c0392b;
+}
 </style>
 
 </head>
@@ -137,7 +139,7 @@ input{
 
     <div class="card">
 
-        <h1 class="title">Edit Teacher</h1>
+        <h1 class="title">Modifier un enseignant</h1>
 
         <?php if($message){ ?>
             <div class="message <?php echo $type; ?>">
@@ -149,8 +151,8 @@ input{
 
             <input type="text" name="name" value="<?php echo htmlspecialchars($name); ?>" required>
             <input type="text" name="subject" value="<?php echo htmlspecialchars($subject); ?>" required>
-            <a href="list.php" style="margin-left:10px;text-decoration:none;color:#4b5563;font-weight:600;"> ← Back to list </a>
-            <button type="submit" name="update" class="btn">Update</button>
+            <a href="list.php" style="margin-left:10px;text-decoration:none;color:#4b5563;font-weight:600;"> ← Retour à la liste </a>
+            <button type="submit" name="update" class="btn">Mettre à jour l'enseignant</button>
 
         </form>
 

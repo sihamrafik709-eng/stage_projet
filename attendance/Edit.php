@@ -1,6 +1,6 @@
-<?php include("../includes/navbar.php"); ?>
+<?php session_start();
+include("../includes/navbar.php"); ?>
 <?php
-session_start();
 include("../config/db.php");
 
 if (!isset($_SESSION['user'])) {
@@ -17,7 +17,6 @@ if ($id === 0) {
 
 $error = "";
 
-// --- Mise à jour ---
 if (isset($_POST['save'])) {
     $student_id = $_POST['student_id'] ?? '';
     $date       = $_POST['date'] ?? '';
@@ -39,7 +38,6 @@ if (isset($_POST['save'])) {
     }
 }
 
-// --- Récupération de la présence existante ---
 $stmt = $conn->prepare("SELECT * FROM attendance WHERE id = ?");
 $stmt->bind_param("i", $id);
 $stmt->execute();
@@ -59,155 +57,130 @@ $students = $conn->query("SELECT * FROM students ORDER BY first_name");
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Modifier une présence — SMS Admin</title>
-
 <style>
-    :root{
-        --navy:#0f1b3c;
-        --navy-light:#16213e;
-        --gold:#c9a44c;
-        --gold-light:#e3c878;
-        --forest:#2e7d4f;
-        --danger:#c0392b;
-        --bg:#f4f5f7;
-        --card-border:#e6e2d6;
-        --text-dark:#1c1f2a;
-        --text-muted:#6b7280;
-    }
+body{
+    background:#eef1f6;
+    margin:0;
+    font-family:'Segoe UI',sans-serif;
+}
 
-    *{box-sizing:border-box;}
+.container{
+    max-width:520px;
+    margin:56px auto;
+    padding:0 20px;
+}
 
-    body{
-        margin:0;
-        font-family:'Segoe UI', Arial, sans-serif;
-        background:var(--bg);
-        min-height:100vh;
-        display:flex;
-        align-items:center;
-        justify-content:center;
-        padding:20px;
-    }
+.page-header{
+    margin-bottom:28px;
+}
 
-    .container{
-        width:100%;
-        max-width:420px;
-        background:#fff;
-        padding:32px 30px;
-        border-radius:14px;
-        border:1px solid var(--card-border);
-        box-shadow:0 4px 18px rgba(15,27,60,0.08);
-        position:relative;
-        overflow:hidden;
-    }
+.page-eyebrow{
+    display:block;
+    font-size:12px;
+    font-weight:700;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:#b8902a;
+    margin-bottom:8px;
+}
 
-    .container::before{
-        content:"";
-        position:absolute;
-        top:0; left:0; right:0;
-        height:5px;
-        background:linear-gradient(90deg, var(--navy), var(--gold));
-    }
+.title{
+    font-size:28px;
+    font-weight:800;
+    color:#16213e;
+    margin:0 0 10px;
+}
 
-    .header-icon{
-        width:54px;
-        height:54px;
-        border-radius:12px;
-        background:#fdf1e7;
-        color:#c9821f;
-        display:flex;
-        align-items:center;
-        justify-content:center;
-        font-size:26px;
-        margin:6px auto 16px auto;
-    }
+.title-rule{
+    width:56px;
+    height:3px;
+    background:#b8902a;
+    border:none;
+    margin:0 0 12px;
+}
 
-    h2{
-        text-align:center;
-        color:var(--navy);
-        margin:0 0 4px 0;
-        font-size:21px;
-    }
+.page-meta{
+    font-size:14px;
+    color:#94a3b8;
+}
 
-    .subtitle{
-        text-align:center;
-        color:var(--text-muted);
-        font-size:13.5px;
-        margin-bottom:24px;
-    }
+.card{
+    background:#ffffff;
+    border-radius:12px;
+    box-shadow:0 6px 24px rgba(22,33,62,.08);
+    padding:28px;
+}
 
-    label{
-        display:block;
-        font-size:13px;
-        font-weight:600;
-        color:var(--navy);
-        margin-bottom:6px;
-        margin-top:16px;
-    }
+.error-box{
+    background:#fdecea;
+    border:1px solid #c0392b;
+    color:#c0392b;
+    padding:10px 14px;
+    border-radius:8px;
+    margin-bottom:18px;
+    font-size:14px;
+}
 
-    input, select{
-        width:100%;
-        padding:11px 12px;
-        border:1px solid var(--card-border);
-        border-radius:8px;
-        font-size:14px;
-        font-family:inherit;
-        background:#fafafa;
-        transition:border-color .2s ease;
-    }
+.field-label{
+    display:block;
+    font-size:12px;
+    font-weight:700;
+    letter-spacing:.06em;
+    text-transform:uppercase;
+    color:#334155;
+    margin-bottom:8px;
+}
 
-    input:focus, select:focus{
-        outline:none;
-        border-color:var(--gold);
-        background:#fff;
-    }
+input,
+select{
+    width:100%;
+    box-sizing:border-box;
+    padding:11px 14px;
+    font-size:15px;
+    border:1.5px solid #dde2ec;
+    border-radius:8px;
+    margin-bottom:22px;
+    background:#fff;
+}
 
-    .btn-row{
-        display:flex;
-        gap:10px;
-        margin-top:24px;
-    }
+input:focus,
+select:focus{
+    outline:none;
+    border-color:#2c3e67;
+}
 
-    button, .btn-cancel{
-        flex:1;
-        padding:12px;
-        border:none;
-        border-radius:8px;
-        font-size:14.5px;
-        font-weight:700;
-        letter-spacing:0.3px;
-        cursor:pointer;
-        text-align:center;
-        text-decoration:none;
-        font-family:inherit;
-    }
+.form-actions{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:12px;
+}
 
-    button{
-        background:var(--navy-light);
-        color:#fff;
-        transition:background .2s ease;
-    }
+.btn-primary{
+    background:#15803d;
+    color:#fff;
+    border:none;
+    padding:11px 22px;
+    border-radius:8px;
+    font-size:14px;
+    font-weight:600;
+    cursor:pointer;
+}
 
-    button:hover{
-        background:var(--navy);
-    }
+.btn-primary:hover{
+    background:#0f5c2c;
+}
 
-    .btn-cancel{
-        background:#f1f1f1;
-        color:var(--text-muted);
-    }
+.btn-back{
+    color:#94a3b8;
+    text-decoration:none;
+    font-size:14px;
+    font-weight:600;
+}
 
-    .btn-cancel:hover{
-        background:#e5e5e5;
-    }
-
-    .error-box{
-        background:#fdecea;
-        color:var(--danger);
-        border:1px solid #f5c6c0;
-        padding:10px 14px;
-        border-radius:8px;
-        font-size:13.5px;
-        margin-bottom:10px;
-    }
+.btn-back:hover{
+    color:#2c3e67;
+}
 </style>
 </head>
 
@@ -215,44 +188,100 @@ $students = $conn->query("SELECT * FROM students ORDER BY first_name");
 
 <div class="container">
 
-    <div class="header-icon">✏️</div>
-    <h2>Modifier une présence</h2>
-    <p class="subtitle">Mettre à jour le statut de présence de l'étudiant</p>
-
-    <?php if ($error): ?>
-        <div class="error-box"><?php echo htmlspecialchars($error); ?></div>
-    <?php endif; ?>
-
-    <form method="POST">
-
-        <label for="student_id">Étudiant</label>
-        <select id="student_id" name="student_id" required>
-            <?php while ($row = $students->fetch_assoc()): ?>
-                <option value="<?php echo (int)$row['id']; ?>"
-                    <?php echo ((int)$row['id'] === (int)$attendance['student_id']) ? 'selected' : ''; ?>>
-                    <?php echo htmlspecialchars($row['first_name'] . " " . $row['last_name']); ?>
-                </option>
-            <?php endwhile; ?>
-        </select>
-
-        <label for="date">Date</label>
-        <input type="date" id="date" name="date" required
-            value="<?php echo htmlspecialchars($attendance['date']); ?>">
-
-        <label for="status">Statut</label>
-        <select id="status" name="status" required>
-            <option value="present" <?php echo $attendance['status'] === 'present' ? 'selected' : ''; ?>>Présent</option>
-            <option value="absent" <?php echo $attendance['status'] === 'absent' ? 'selected' : ''; ?>>Absent</option>
-        </select>
-
-        <div class="btn-row">
-            <a href="list.php" class="btn-cancel">Annuler</a>
-            <button type="submit" name="save">Enregistrer</button>
+    <div class="page-header">
+        <span class="page-eyebrow">Gestion des présences</span>
+        <h1 class="title">Modifier une présence</h1>
+        <hr class="title-rule">
+        <div class="page-meta">
+            Mettre à jour les informations de présence de l'étudiant
         </div>
+    </div>
 
-    </form>
+    <div class="card">
+
+        <?php if (!empty($error)) { ?>
+            <div class="message error" id="msg">
+                <?php echo htmlspecialchars($error); ?>
+            </div>
+        <?php } ?>
+
+        <form method="POST">
+
+            <label class="field-label" for="student_id">
+                Étudiant
+            </label>
+
+            <select id="student_id" name="student_id" required>
+                <?php while ($row = $students->fetch_assoc()) { ?>
+                    <option
+                        value="<?php echo (int)$row['id']; ?>"
+                        <?php echo ((int)$row['id'] === (int)$attendance['student_id']) ? 'selected' : ''; ?>
+                    >
+                        <?php echo htmlspecialchars($row['first_name'].' '.$row['last_name']); ?>
+                    </option>
+                <?php } ?>
+            </select>
+
+            <label class="field-label" for="date">
+                Date
+            </label>
+
+            <input
+                type="date"
+                id="date"
+                name="date"
+                value="<?php echo htmlspecialchars($attendance['date']); ?>"
+                required
+            >
+
+            <label class="field-label" for="status">
+                Statut
+            </label>
+
+            <select id="status" name="status" required>
+                <option value="present"
+                    <?php echo $attendance['status'] === 'present' ? 'selected' : ''; ?>>
+                    Present
+                </option>
+
+                <option value="absent"
+                    <?php echo $attendance['status'] === 'absent' ? 'selected' : ''; ?>>
+                    Absent
+                </option>
+            </select>
+
+            <div class="form-actions">
+
+                <a href="list.php" class="btn-back">
+                    &larr; Retour à la liste
+                </a>
+
+                <button type="submit" name="save" class="btn-primary">
+                    Mettre à jour la présence
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
 
 </div>
+
+<script>
+setTimeout(function(){
+    let msg = document.getElementById("msg");
+
+    if(msg){
+        msg.style.transition = "opacity 0.5s ease";
+        msg.style.opacity = "0";
+
+        setTimeout(() => {
+            msg.remove();
+        }, 500);
+    }
+}, 3000);
+</script>
 
 </body>
 </html>

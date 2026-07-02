@@ -1,14 +1,14 @@
-<?php include("../includes/navbar.php"); ?>
-<?php
+<?php 
 session_start();
-include("../config/db.php");
+include("../includes/navbar.php");
 
-if (!isset($_SESSION['user'])) {
+if(!isset($_SESSION['user'])){
     header("Location: ../auth/login.php");
     exit();
 }
 
-// --- Suppression d'une présence ---
+include("../config/db.php");
+
 if (isset($_GET['delete'])) {
     $deleteId = (int) $_GET['delete'];
     $stmt = $conn->prepare("DELETE FROM attendance WHERE id = ?");
@@ -25,227 +25,271 @@ $sql = "SELECT attendance.*, students.first_name, students.last_name
         ORDER BY attendance.date DESC";
 
 $result = $conn->query($sql);
+$count = $result ? $result->num_rows : 0;
 ?>
 <!DOCTYPE html>
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Liste des présences — SMS Admin</title>
-
+<title>Présences — SMS Admin</title>
+<link rel="stylesheet" href="../assets/css/style.css">
 <style>
-    :root{
-        --navy:#0f1b3c;
-        --navy-light:#16213e;
-        --gold:#c9a44c;
-        --gold-light:#e3c878;
-        --forest:#2e7d4f;
-        --danger:#c0392b;
-        --bg:#f4f5f7;
-        --card-border:#e6e2d6;
-        --text-dark:#1c1f2a;
-        --text-muted:#6b7280;
+   body {
+    background: #eef1f6;
+}
+
+.container {
+    max-width: 960px;
+    margin: 56px auto;
+    padding: 0 20px;
+}
+
+.page-header {
+    margin-bottom: 28px;
+}
+
+.page-eyebrow {
+    display: block;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #b8902a;
+    margin-bottom: 8px;
+}
+
+.title {
+    font-size: 28px;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    color:#16213e;;
+    margin: 0 0 10px;
+}
+
+.title-rule {
+    width: 56px;
+    height: 3px;
+    background: #b8902a;
+    border: none;
+    margin: 0 0 12px;
+}
+
+.page-meta {
+    font-size: 14px;
+    color: #94a3b8;
+}
+
+.top-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.btn-add {
+    display: inline-block;
+    background: #15803d;
+    color: #fff;
+    text-decoration: none;
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 14px;
+    transition: background .2s;
+}
+
+.btn-add:hover {
+    background: #0f5c2c;
+}
+
+.search-box input {
+    padding: 10px 14px 10px 38px;
+    border: 1px solid #dde3ef;
+    border-radius: 8px;
+    font-size: 14px;
+    background: #fff url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="%2394a3b8" viewBox="0 0 16 16"><path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/></svg>') no-repeat 12px center;
+    background-size: 14px;
+    min-width: 240px;
+    outline: none;
+    transition: border-color .2s;
+}
+
+.search-box input:focus {
+    border-color: #b8902a;
+}
+
+.table-wrapper {
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 6px 24px rgba(22,33,62,0.08);
+    overflow: hidden;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+thead {
+    background: #0f1b3c;
+}
+
+thead th {
+    color: #ffffff;
+    font-weight: 600;
+    text-align: left;
+    padding: 14px 22px;
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+tbody tr {
+    border-bottom: 1px solid #eef0f4;
+    transition: background 0.15s ease;
+}
+
+tbody tr:last-child {
+    border-bottom: none;
+}
+
+tbody tr:hover {
+    background: #eef1fa;
+}
+
+td {
+    padding: 14px 22px;
+    color: #334155;
+    font-size: 15px;
+    vertical-align: middle;
+}
+
+.student-name {
+    font-weight: 600;
+    color: #303d61;
+}
+
+.badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12.5px;
+    font-weight: 700;
+}
+
+.badge.present {
+    background: #e6f4ea;
+    color: #15803d;
+}
+
+.badge.absent {
+    background: #fdecea;
+    color: #c0392b;
+}
+
+.actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 13px;
+    border-radius: 7px;
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+    transition: opacity .15s;
+}
+
+.btn:hover {
+    opacity: .85;
+}
+
+.btn svg {
+    width: 13px;
+    height: 13px;
+}
+
+.btn-edit {
+    background: #188003;
+    color: #fff;
+}
+
+.btn-delete {
+    background: #ad0303;
+    color: #fff;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 48px 20px;
+    color: #94a3b8;
+    font-size: 15px;
+}
+
+@media (max-width: 600px) {
+    .table-wrapper {
+        overflow-x: auto;
     }
 
-    *{box-sizing:border-box;}
-
-    body{
-        margin:0;
-        font-family:'Segoe UI', Arial, sans-serif;
-        background:var(--bg);
-        color:var(--text-dark);
+    table {
+        min-width: 560px;
     }
-
-    .container{
-        width:90%;
-        max-width:1100px;
-        margin:36px auto;
-    }
-
-    .top-bar{
-        display:flex;
-        justify-content:space-between;
-        align-items:center;
-        flex-wrap:wrap;
-        gap:12px;
-        margin-bottom:20px;
-    }
-
-    h2{
-        color:var(--navy);
-        margin:0;
-        font-size:22px;
-    }
-
-    .add-btn{
-        background:var(--navy-light);
-        color:#fff;
-        text-decoration:none;
-        padding:10px 18px;
-        border-radius:8px;
-        font-size:13.5px;
-        font-weight:700;
-        transition:background .2s ease;
-    }
-
-    .add-btn:hover{
-        background:var(--navy);
-    }
-
-    .search-box{
-        position:relative;
-        margin-bottom:16px;
-    }
-
-    .search-box input{
-        width:100%;
-        max-width:320px;
-        padding:11px 14px 11px 38px;
-        border:1px solid var(--card-border);
-        border-radius:8px;
-        font-size:14px;
-        background:#fff url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="%236b7280" viewBox="0 0 16 16"><path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/></svg>') no-repeat 12px center;
-        background-size:14px;
-    }
-
-    .search-box input:focus{
-        outline:none;
-        border-color:var(--gold);
-    }
-
-    .panel{
-        background:#fff;
-        border-radius:12px;
-        border:1px solid var(--card-border);
-        box-shadow:0 2px 6px rgba(15,27,60,0.05);
-        overflow:hidden;
-    }
-
-    table{
-        width:100%;
-        border-collapse:collapse;
-    }
-
-    th{
-        background:var(--navy-light);
-        color:#fff;
-        padding:13px 14px;
-        text-align:left;
-        font-size:13px;
-        text-transform:uppercase;
-        letter-spacing:0.4px;
-    }
-
-    td{
-        padding:13px 14px;
-        border-bottom:1px solid #f0f0f0;
-        font-size:14.5px;
-    }
-
-    tbody tr:hover td{
-        background:#faf9f5;
-    }
-
-    .badge{
-        display:inline-block;
-        padding:4px 12px;
-        border-radius:20px;
-        font-size:12.5px;
-        font-weight:700;
-        text-transform:capitalize;
-    }
-
-    .badge.present{
-        background:#e6f4ea;
-        color:var(--forest);
-    }
-
-    .badge.absent{
-        background:#fdecea;
-        color:var(--danger);
-    }
-
-    .empty-row td{
-        text-align:center;
-        color:var(--text-muted);
-        padding:24px;
-    }
-
-    .actions{
-        display:flex;
-        gap:8px;
-    }
-
-    .btn-action{
-        display:inline-flex;
-        align-items:center;
-        gap:5px;
-        padding:7px 12px;
-        border-radius:7px;
-        font-size:12.5px;
-        font-weight:700;
-        text-decoration:none;
-        border:none;
-        cursor:pointer;
-        font-family:inherit;
-    }
-
-    .btn-edit{
-        background:green;
-        color:white;
-    }
-
-    .btn-edit:hover{
-        background:green;
-    }
-
-    .btn-delete{
-        background:red;
-        color:white;
-    }
-
-    .btn-delete:hover{
-        background:red;
-    }
+}
 </style>
-
 </head>
-
 <body>
 
 <div class="container">
 
-    <div class="top-bar">
-        <h2>Liste des présences</h2>
-        <a href="add.php" class="add-btn">+ Ajouter une présence</a>
+    <div class="page-header">
+        <span class="page-eyebrow">Suivi scolaire</span>
+        <h1 class="title">Présences</h1>
+        <hr class="title-rule">
+        <p class="page-meta">
+            <?php echo $count; ?> présence<?php echo $count !== 1 ? 's' : ''; ?> enregistrée<?php echo $count !== 1 ? 's' : ''; ?>
+        </p>
     </div>
 
-    <div class="search-box">
-        <input type="text" id="search" placeholder="Rechercher un étudiant...">
+    <div class="top-actions">
+        <a href="add.php" class="btn-add">+ Ajouter une présence</a>
+        <div class="search-box">
+            <input type="text" id="search" placeholder="Rechercher un étudiant...">
+        </div>
     </div>
 
-    <div class="panel">
+    <div class="table-wrapper">
         <table id="table">
             <thead>
-            <tr>
-                <th>Étudiant</th>
-                <th>Date</th>
-                <th>Statut</th>
-                <th>Action</th>
-            </tr>
+                <tr>
+                    <th>Étudiant</th>
+                    <th>Date</th>
+                    <th>Statut</th>
+                    <th>Action</th>
+                </tr>
             </thead>
             <tbody>
-            <?php if ($result->num_rows === 0): ?>
-                <tr class="empty-row">
-                    <td colspan="4">Aucune présence enregistrée pour le moment.</td>
+            <?php if ($count === 0): ?>
+                <tr>
+                    <td colspan="4" class="empty-state">Aucune présence enregistrée pour le moment.</td>
                 </tr>
             <?php else: ?>
                 <?php while ($row = $result->fetch_assoc()):
-                    $status = $row['status'];
+                    $status      = $row['status'];
                     $statusLabel = $status === 'present' ? 'Présent' : 'Absent';
                 ?>
                 <tr>
-                    <td><?php echo htmlspecialchars($row['first_name'] . " " . $row['last_name']); ?></td>
+                    <td><span class="student-name"><?php echo htmlspecialchars($row['first_name'] . ' ' . $row['last_name']); ?></span></td>
                     <td><?php echo htmlspecialchars($row['date']); ?></td>
                     <td>
                         <span class="badge <?php echo htmlspecialchars($status); ?>">
@@ -254,9 +298,15 @@ $result = $conn->query($sql);
                     </td>
                     <td>
                         <div class="actions">
-                            <a class="btn-action btn-edit" href="Edit.php?id=<?php echo (int)$row['id']; ?>"> Modifier</a>
-                            <button type="button" class="btn-action btn-delete"
-                                onclick="confirmDelete(<?php echo (int)$row['id']; ?>)"> Supprimer</button>
+                            <a href="Edit.php?id=<?php echo (int)$row['id']; ?>" class="btn btn-edit">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                                Modifier
+                            </a>
+                            <button type="button" class="btn btn-delete"
+                                onclick="confirmDelete(<?php echo (int)$row['id']; ?>)">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"></path><path d="M10 11v6"></path><path d="M14 11v6"></path></svg>
+                                Supprimer
+                            </button>
                         </div>
                     </td>
                 </tr>
@@ -270,12 +320,9 @@ $result = $conn->query($sql);
 
 <script>
 document.getElementById("search").addEventListener("keyup", function(){
-    let value = this.value.toLowerCase();
-    let rows = document.querySelectorAll("#table tbody tr");
-
-    rows.forEach((row) => {
-        let text = row.textContent.toLowerCase();
-        row.style.display = text.includes(value) ? "" : "none";
+    const value = this.value.toLowerCase();
+    document.querySelectorAll("#table tbody tr").forEach(row => {
+        row.style.display = row.textContent.toLowerCase().includes(value) ? "" : "none";
     });
 });
 

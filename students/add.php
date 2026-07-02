@@ -10,6 +10,7 @@ $last_name  = "";
 $email      = "";
 $phone      = "";
 $class_id   = "";
+$status = "active";
 
 if (isset($_POST['add'])) {
 
@@ -18,6 +19,7 @@ if (isset($_POST['add'])) {
     $email      = trim($_POST['email']);
     $phone      = trim($_POST['phone']);
     $class_id   = trim($_POST['class_id']);
+    $status  = $_POST['status'] ?? 'active';
 
     if ($first_name === "" || $last_name === "" || $class_id === "") {
 
@@ -28,17 +30,18 @@ if (isset($_POST['add'])) {
 
         $stmt = $conn->prepare("
             INSERT INTO students
-            (first_name, last_name, email, phone, class_id)
-            VALUES (?, ?, ?, ?, ?)
+            (first_name, last_name, email, phone, class_id, status)
+            VALUES (?, ?, ?, ?, ?, ?)
         ");
 
         $stmt->bind_param(
-            "ssssi",
+            "ssssis",
             $first_name,
             $last_name,
             $email,
             $phone,
-            $class_id
+            $class_id,
+            $status
         );
 
         if ($stmt->execute()) {
@@ -51,6 +54,7 @@ if (isset($_POST['add'])) {
             $email = "";
             $phone = "";
             $class_id = "";
+            $status = "";
 
         } else {
 
@@ -66,28 +70,13 @@ if (isset($_POST['add'])) {
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Add Student</title>
+<title>Ajouter un étudiant</title>
 
 <link rel="stylesheet" href="../assets/css/style.css">
 
 <style>
-:root{
-    --bg-page:#eef1f6;
-    --surface:#ffffff;
-    --navy-900:#16213e;
-    --navy-700:#2c3e67;
-    --gold-500:#b8902a;
-    --slate-700:#334155;
-    --slate-400:#94a3b8;
-    --green-600:#15803d;
-    --green-700:#0f5c2c;
-    --green-050:#eafbf0;
-    --red-600:#c0392b;
-    --red-050:#fdecea;
-}
-
 body{
-    background:var(--bg-page);
+    background:#eef1f6;
 }
 
 .container{
@@ -106,31 +95,31 @@ body{
     font-weight:700;
     letter-spacing:.12em;
     text-transform:uppercase;
-    color:var(--gold-500);
+    color:#b8902a;
     margin-bottom:8px;
 }
 
 .title{
     font-size:30px;
     font-weight:800;
-    color:var(--navy-900);
+    color:#16213e;
     margin:0;
 }
 
 .title-rule{
     width:60px;
     height:3px;
-    background:var(--gold-500);
+    background:#b8902a;
     border:none;
     margin:12px 0;
 }
 
 .page-meta{
-    color:var(--slate-400);
+    color:#94a3b8;
 }
 
 .card{
-    background:var(--surface);
+    background:#ffffff;
     padding:30px;
     border-radius:12px;
     box-shadow:0 6px 24px rgba(22,33,62,.08);
@@ -144,15 +133,15 @@ body{
 }
 
 .success{
-    background:var(--green-050);
-    color:var(--green-700);
-    border-color:var(--green-600);
+    background:#eafbf0;
+    color:#0f5c2c;
+    border-color:#15803d;
 }
 
 .error{
-    background:var(--red-050);
-    color:var(--red-600);
-    border-color:var(--red-600);
+    background:#fdecea;
+    color:#c0392b;
+    border-color:#c0392b;
 }
 
 .row{
@@ -170,7 +159,7 @@ body{
     font-weight:700;
     text-transform:uppercase;
     letter-spacing:.05em;
-    color:var(--slate-700);
+    color:#334155;
     margin-bottom:8px;
 }
 
@@ -187,7 +176,7 @@ select{
 input:focus,
 select:focus{
     outline:none;
-    border-color:var(--navy-700);
+    border-color:#2c3e67;
 }
 
 .form-actions{
@@ -198,16 +187,16 @@ select:focus{
 
 .btn-back{
     text-decoration:none;
-    color:var(--slate-400);
+    color:#94a3b8;
     font-weight:600;
 }
 
 .btn-back:hover{
-    color:var(--navy-700);
+    color:#2c3e67;
 }
 
 .btn-primary{
-    background:var(--green-600);
+    background:#15803d;
     color:#fff;
     border:none;
     padding:12px 24px;
@@ -217,7 +206,7 @@ select:focus{
 }
 
 .btn-primary:hover{
-    background:var(--green-700);
+    background:#0f5c2c;
 }
 </style>
 </head>
@@ -226,11 +215,11 @@ select:focus{
 <div class="container">
 
     <div class="page-header">
-        <span class="page-eyebrow">School Records</span>
-        <h1 class="title">Add Student</h1>
+        <span class="page-eyebrow">Dossiers scolaires</span>
+        <h1 class="title">Ajouter un étudiant</h1>
         <hr class="title-rule">
         <div class="page-meta">
-            Create a new student record.
+            Créer un nouveau dossier étudiant
         </div>
     </div>
 
@@ -247,7 +236,7 @@ select:focus{
             <div class="row">
 
                 <div class="field">
-                    <label class="field-label">First Name</label>
+                    <label class="field-label">Prénom</label>
                     <input
                         type="text"
                         name="first_name"
@@ -257,7 +246,7 @@ select:focus{
                 </div>
 
                 <div class="field">
-                    <label class="field-label">Last Name</label>
+                    <label class="field-label">Nom</label>
                     <input
                         type="text"
                         name="last_name"
@@ -268,24 +257,24 @@ select:focus{
 
             </div>
 
-            <label class="field-label">Email</label>
+            <label class="field-label">Adresse e-mail</label>
             <input
                 type="email"
                 name="email"
                 value="<?php echo htmlspecialchars($email); ?>"
             >
 
-            <label class="field-label">Phone</label>
+            <label class="field-label">Téléphone</label>
             <input
                 type="text"
                 name="phone"
                 value="<?php echo htmlspecialchars($phone); ?>"
             >
 
-            <label class="field-label">Class</label>
+            <label class="field-label">Classe</label>
             <select name="class_id" required>
 
-                <option value="">Select Class</option>
+                <option value="">Sélectionnez une classe</option>
 
                 <?php
                 $result = $conn->query("SELECT * FROM classes ORDER BY name");
@@ -302,14 +291,25 @@ select:focus{
                 ?>
 
             </select>
+            <label class="field-label">Statut</label>
+
+           <select name="status">
+        <option value="active" <?php echo $status == "active" ? "selected" : ""; ?>>
+        Actif
+        </option>
+
+        <option value="inactive" <?php echo $status == "inactive" ? "selected" : ""; ?>>
+        Inactif
+        </option>
+            </select>
 
             <div class="form-actions">
                 <a href="list.php" class="btn-back">
-                    ← Back to list
+                    ← Retour à la liste
                 </a>
 
                 <button type="submit" name="add" class="btn-primary">
-                    Add Student
+                    Ajouter un étudiant
                 </button>
             </div>
 
