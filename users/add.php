@@ -1,5 +1,5 @@
 <?php
-include("../includes/navbar.php");
+session_start();
 include("../config/db.php");
 
 $message = "";
@@ -286,4 +286,5 @@ toggleStudent();
 role.addEventListener("change", toggleStudent);
 </script>
 </body>
+<?php include("../includes/navbar.php"); ?>
 </html>

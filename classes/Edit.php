@@ -1,4 +1,4 @@
-<?php include("../includes/navbar.php"); ?>
+
 <?php
 include("../config/db.php");
 
@@ -223,4 +223,5 @@ input[type="text"]:focus {
 </div>
 
 </body>
+<?php include("../includes/navbar.php"); ?>
 </html>

@@ -52,13 +52,13 @@ body{
     margin-bottom:8px;
 }
 
-.title{
-    font-size:30px;
-    font-weight:800;
-    color:#16213e;
-    margin:0;
+.title {
+    font-size: 28px;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    color: #16213e;
+    margin: 0 0 10px;
 }
-
 .title-rule{
     width:60px;
     height:3px;

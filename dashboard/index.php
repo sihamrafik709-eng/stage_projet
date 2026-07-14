@@ -68,53 +68,11 @@ body{
     color:#1c1f2a;
 }
 
-.sidebar{
-    position:fixed;
-    left:0;
-    top:0;
-    width:230px;
-    height:100%;
-    background:#0f1b3c;
-    padding:24px 16px;
-    color:#fff;
-    border-right:3px solid #c9a44c;
-}
 
-.sidebar h2{
-    color:#e3c878;
-    font-size:20px;
-    letter-spacing:0.5px;
-    margin:0 0 30px 6px;
-    font-weight:700;
-}
 
-.sidebar a{
-    display:flex;
-    align-items:center;
-    gap:10px;
-    color:#dfe3ee;
-    text-decoration:none;
-    padding:11px 12px;
-    margin-bottom:6px;
-    border-radius:8px;
-    font-size:14.5px;
-    transition:all .2s ease;
-}
 
-.sidebar a:hover{
-    background:#1f2a4a;
-    color:#e3c878;
-}
-
-.sidebar a.active{
-    background:#1f2a4a;
-    color:#e3c878;
-    border-left:3px solid #c9a44c;
-    font-weight:600;
-}
-
-.main{
-    margin-left:230px;
+.main-content{
+    margin-left:260px;
     padding:28px 32px;
 }
 
@@ -322,32 +280,9 @@ tr:hover td{
 </style>
 </head>
 <body>
+<?php include("../includes/navbar.php"); ?>
 
-
-<div class="sidebar">
-    <h2>🎓 SMS Admin</h2>
-
-    <?php if($_SESSION['role'] == 'admin') { ?>
-
-        <a href="index.php">📊 Tableau de bord </a>
-        <a href="../students/list.php">🎓 Étudiants</a>
-        <a href="../teachers/list.php">📋 Enseignants</a>
-        <a href="../classes/list.php">👥 Classes</a>
-        <a href="../attendance/list.php">✅ Présences</a>
-        <a href="../grades/list.php">📈 Notes</a>
-        <a href="../users/list.php">🔐 Utilisateurs</a>
-
-    <?php } elseif($_SESSION['role'] == 'teacher') { ?>
-
-        <a href="index.php">📊 Tableau de bord </a>
-        <a href="../students/list.php">🎓 Étudiants</a>
-        <a href="../attendance/list.php">✅ Présences</a>
-        <a href="../grades/list.php">📈 Notes</a>
-
-    <?php } ?>
-</div>
-
-<div class="main">
+<div class="main-content">
 
     <div class="header">
         <h1>Tableau de bord</h1>

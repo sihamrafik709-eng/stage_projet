@@ -1,5 +1,5 @@
 <?php
-include("../includes/navbar.php");
+session_start();
 include("../config/db.php");
 
 $id = (int)($_GET['id'] ?? 0);
@@ -302,6 +302,7 @@ select:focus {
                 {$student['first_name']} {$student['last_name']}
               </option>";
     }
+     
     ?>
 </select>
 
@@ -344,4 +345,5 @@ toggleStudent();
 role.addEventListener("change", toggleStudent);
 </script>
 </body>
+<?php include("../includes/navbar.php") ?>
 </html>

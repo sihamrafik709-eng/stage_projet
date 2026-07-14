@@ -1,15 +1,14 @@
 <?php
 session_start();
-include("../includes/navbar.php"); ?>
-<?php
-if(!isset($_SESSION['user'])){
-    header("Location: ../auth/login.php");
-    exit();
-}
 include("../config/db.php");
 
 if (!isset($_SESSION['user'])) {
     header("Location: ../auth/login.php");
+    exit();
+}
+
+if (!in_array($_SESSION['role'], ['admin', 'teacher'])) {
+    header("Location: ../dashboard/index.php");
     exit();
 }
 
@@ -38,15 +37,16 @@ $result = $conn->query($sql);
 <title>Liste des notes — SMS Admin</title>
 <style>
 body{
+    background:#eef3f8;
     margin:0;
-    font-family:'Segoe UI',sans-serif;
-    background:#eef1f6;
+    font-family:Arial,sans-serif;
 }
 
 .container{
-    max-width:960px;
-    margin:56px auto;
+    max-width:1200px;
+    margin:50px auto;
     padding:0 20px;
+    margin-left:330px;
 }
 
 .page-header{
@@ -57,27 +57,26 @@ body{
     display:block;
     font-size:12px;
     font-weight:700;
-    letter-spacing:.14em;
+    letter-spacing:.12em;
     text-transform:uppercase;
-    color:#b8902a;
+    color:#d4a017;
     margin-bottom:8px;
 }
 
-.title{
-    font-size:28px;
-    font-weight:800;
-    color:#16213e;
-    margin:0 0 10px;
+.title {
+    font-size: 28px;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    color: #16213e;
+    margin: 0 0 10px;
 }
-
 .title-rule{
-    width:56px;
+    width:60px;
     height:3px;
-    background:#b8902a;
+    background:#d4a017;
     border:none;
-    margin:0 0 12px;
+    margin:12px 0;
 }
-
 .page-meta{
     font-size:14px;
     color:#94a3b8;
@@ -187,6 +186,8 @@ td{
 
 <body>
 
+<?php include("../includes/navbar.php"); ?>
+
 <div class="container">
 
     <div class="page-header">
@@ -225,11 +226,11 @@ td{
                 <?php while ($row = $result->fetch_assoc()):
                     $score = (float) $row['score'];
                     if ($score >= 14) {
-                        $badgeClass = 'Good';
+                        $badgeClass = 'good';
                     } elseif ($score >= 10) {
-                        $badgeClass = 'Average';
+                        $badgeClass = 'average';
                     } else {
-                        $badgeClass = 'Low';
+                        $badgeClass = 'low';
                     }
                 ?>
                 <tr>

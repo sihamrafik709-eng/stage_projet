@@ -19,20 +19,18 @@ $result = $conn->query("SELECT * FROM teachers ORDER BY id DESC");
 <title>Liste des enseignants</title>
 
 <style>
-*{
-    box-sizing:border-box;
-    font-family:Arial,sans-serif;
-}
 
 body{
-    background:#eef1f6;
+    background:#eef3f8;
     margin:0;
+    font-family:Arial,sans-serif;
 }
 
 .container{
     max-width:1200px;
     margin:50px auto;
-    padding:0 150px;
+    padding:0 20px;
+    margin-left:330px;
 }
 
 .page-header{
@@ -45,25 +43,24 @@ body{
     font-weight:700;
     letter-spacing:.12em;
     text-transform:uppercase;
-    color:#b8902a;
+    color:#d4a017;
     margin-bottom:8px;
 }
 
-.title{
-    font-size:30px;
-    font-weight:800;
-    color:#16213e;
-    margin:0;
+.title {
+    font-size: 28px;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    color: #16213e;
+    margin: 0 0 10px;
 }
-
 .title-rule{
     width:60px;
     height:3px;
-    background:#b8902a;
+    background:#d4a017;
     border:none;
     margin:12px 0;
 }
-
 .page-meta{
     color:#94a3b8;
 }

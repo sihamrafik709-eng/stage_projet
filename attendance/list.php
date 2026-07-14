@@ -1,13 +1,17 @@
-<?php 
+<?php
 session_start();
-include("../includes/navbar.php");
+include("../config/db.php");
 
-if(!isset($_SESSION['user'])){
+if (!isset($_SESSION['user'])) {
     header("Location: ../auth/login.php");
     exit();
 }
 
-include("../config/db.php");
+// Contrôle d'accès par rôle
+if (!in_array($_SESSION['role'], ['admin', 'teacher'])) {
+    header("Location: ../dashboard/index.php");
+    exit();
+}
 
 if (isset($_GET['delete'])) {
     $deleteId = (int) $_GET['delete'];
@@ -35,44 +39,46 @@ $count = $result ? $result->num_rows : 0;
 <title>Présences — SMS Admin</title>
 <link rel="stylesheet" href="../assets/css/style.css">
 <style>
-   body {
-    background: #eef1f6;
+body{
+    background:#eef3f8;
+    margin:0;
+    font-family:Arial,sans-serif;
 }
 
-.container {
-    max-width: 960px;
-    margin: 56px auto;
-    padding: 0 20px;
+.container{
+    max-width:1200px;
+    margin:50px auto;
+    padding:0 20px;
+    margin-left:330px;
 }
 
-.page-header {
-    margin-bottom: 28px;
+.page-header{
+    margin-bottom:25px;
 }
 
-.page-eyebrow {
-    display: block;
-    font-size: 12px;
-    font-weight: 700;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: #b8902a;
-    margin-bottom: 8px;
+.page-eyebrow{
+    display:block;
+    font-size:12px;
+    font-weight:700;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+    color:#d4a017;
+    margin-bottom:8px;
 }
 
 .title {
     font-size: 28px;
     font-weight: 800;
     letter-spacing: -0.01em;
-    color:#16213e;;
+    color: #16213e;
     margin: 0 0 10px;
 }
-
-.title-rule {
-    width: 56px;
-    height: 3px;
-    background: #b8902a;
-    border: none;
-    margin: 0 0 12px;
+.title-rule{
+    width:60px;
+    height:3px;
+    background:#d4a017;
+    border:none;
+    margin:12px 0;
 }
 
 .page-meta {
@@ -249,6 +255,8 @@ td {
 </style>
 </head>
 <body>
+
+<?php include("../includes/navbar.php"); ?>
 
 <div class="container">
 

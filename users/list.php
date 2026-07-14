@@ -17,53 +17,46 @@ $result = $conn->query("SELECT * FROM users ORDER BY id DESC");
 <title>Liste des utilisateurs — SMS Admin</title>
 <link rel="stylesheet" href="../assets/css/style.css">
 <style>
-   body {
-    background: #eef1f6;
-    font-family: 'Segoe UI', sans-serif;
-    margin: 0;
+body{
+    background:#eef3f8;
+    margin:0;
+    font-family:Arial,sans-serif;
 }
 
-.container {
-    max-width: 860px;
-    margin: 56px auto;
-    padding: 0 20px;
+.container{
+    max-width:1200px;
+    margin:50px auto;
+    padding:0 20px;
+    margin-left:330px;
 }
 
-.page-header {
-    display: flex;
-    align-items: flex-end;
-    justify-content: space-between;
-    margin-bottom: 28px;
-    flex-wrap: wrap;
-    gap: 16px;
+.page-header{
+    margin-bottom:25px;
 }
 
-.page-header-left {}
-
-.page-eyebrow {
-    display: block;
-    font-size: 12px;
-    font-weight: 700;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: #b8902a;
-    margin-bottom: 8px;
+.page-eyebrow{
+    display:block;
+    font-size:12px;
+    font-weight:700;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+    color:#d4a017;
+    margin-bottom:8px;
 }
 
 .title {
-    font-size: 27px;
-    font-weight: 650;
+    font-size: 28px;
+    font-weight: 800;
     letter-spacing: -0.01em;
     color: #16213e;
     margin: 0 0 10px;
 }
-
-.title-rule {
-    width: 56px;
-    height: 3px;
-    background: #b8902a;
-    border: none;
-    margin: 0;
+.title-rule{
+    width:60px;
+    height:3px;
+    background:#d4a017;
+    border:none;
+    margin:12px 0;
 }
 
 .btn-add {

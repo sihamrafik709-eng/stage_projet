@@ -1,6 +1,5 @@
 <?php 
 session_start();
-include("../includes/navbar.php");
 include("../config/db.php");
 
 if (!isset($_SESSION['user'])) {
@@ -259,4 +258,5 @@ setTimeout(function () {
 </script>
 
 </body>
+<?php include("../includes/navbar.php");?>
 </html>
